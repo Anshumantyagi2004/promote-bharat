@@ -1,0 +1,118 @@
+"use client";
+import Link from "next/link";
+import Image from "next/image";
+import { LogIn, Menu, X, User, LogOut } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
+
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    dispatch(logout());
+    setProfileOpen(false)
+    router.push("/");
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <nav className="w-full border-b border-b-gray-300 bg-white sticky top-0 z-50 h-16">
+      <div className="mx-auto md:px-6 px-2 flex items-center justify-between">
+        <Link href="/">
+          <Image
+            src="/Logo/logo.webp"
+            alt="Promote Bharat"
+            width={200}
+            height={200}
+          />
+        </Link>
+        {user ? (
+          <div className="relative" ref={profileRef}>
+            <button onClick={() => setProfileOpen(!profileOpen)}
+              className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-black" >
+              <User size={25} />
+            </button>
+
+            {profileOpen && (
+              <div className="absolute right-0 mt-1 w-70 bg-white shadow-lg rounded-lg border border-gray-300">
+                <div className="p-4 border-b border-b-gray-300">
+                  <p className="font-semibold text-black text-center">{user?.name}</p>
+                  <p className="text-sm text-gray-800 text-center">{user?.email}</p>
+                </div>
+                <button onClick={() => router.push(`/${user?.role}/dashboard`)}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-100 text-black">
+                  Dashboard
+                </button>
+
+                <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-500 hover:bg-red-100 flex items-center gap-2">
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="hidden md:flex items-center gap-4">
+              <Link href="/register/supplier" className="px-4 py-2.5 text-sm font-medium border text-white rounded-lg bg-[#D01132] hover:bg-[#c0102d]">
+                Register as Supplier
+              </Link>
+
+              <Link href="/register/buyer" className="px-4 py-2.5 text-sm border font-medium text-white bg-[#0A5B93] rounded-lg hover:bg-[#0a5183]">
+                Register as Buyer
+              </Link>
+
+              <Link href="/login" className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <LogIn size={18} />
+                Sign In
+              </Link>
+            </div>
+
+            <button className="md:hidden bg-[#0A5B93] px-3 py-2 rounded-md" onClick={() => setOpen(!open)}>
+              {open ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Mobile Menu */}
+      {!user && open && (
+        <div className="absolute w-full md:hidden px-6 py-3 flex flex-col gap-3 bg-white border-t">
+          <Link href="/register/supplier" className="px-4 py-3 text-white bg-[#D01132] rounded-lg">
+            Register as Supplier
+          </Link>
+
+          <Link href="/register/buyer" className="px-4 py-3 text-white bg-[#0A5B93] rounded-lg">
+            Register as Buyer
+          </Link>
+
+          <Link href="/login" className="flex justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg">
+            <LogIn size={18} />
+            Sign In
+          </Link>
+        </div>
+      )}
+    </nav>
+  );
+}
