@@ -29,7 +29,7 @@ export default function SupplierSidebar() {
     <>
       {/* Sidebar */}
       <aside className={`bg-white border-r border-gray-300 shadow-sm h-screen fixed md:static top-0 left-0 z-40
-        transition-all duration-300 ${open ? "w-64" : "w-16"} md:w-64`}>
+        transition-all duration-300 ${open ? "w-60" : "w-16"} md:w-60`}>
         <nav className="mt-18 md:mt-4 px-2 space-y-2">
           <div className={`flex md:hidden ${open ? "justify-end" : "justify-start"} w-full`}>
             <button className="md:hidden top-4 left-4 z-50 bg-black text-white px-2.5 py-3 rounded-md"
@@ -42,12 +42,11 @@ export default function SupplierSidebar() {
           {menu.map((item, i) => {
             const Icon = item.icon;
             const active = pathname === item.path;
-
             return (
               <Link key={i} href={item.path} onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-3 py-3 rounded-lg transition
                 ${active
-                    ? "bg-blue-100 text-blue-700 font-medium"
+                    ? "bg-blue-100 text-[#0a5183] font-medium"
                     : "text-gray-700 hover:bg-gray-100"
                   }`}
               >

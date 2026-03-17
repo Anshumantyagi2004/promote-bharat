@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (data) => {
 
-  const { name, email, phone, password, role, company } = data;
+  const { name, email, phone, password, role } = data;
 
   const userExists = await User.findOne({ email });
 
@@ -20,7 +20,6 @@ export const registerUser = async (data) => {
     phone,
     password: hashedPassword,
     role,
-    company,
   });
 
   const token = jwt.sign(
@@ -30,4 +29,12 @@ export const registerUser = async (data) => {
   );
 
   return { user, token };
+};
+
+export const updateUser = async (userId, data) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    { $set: data },
+    { new: true }
+  );
 };

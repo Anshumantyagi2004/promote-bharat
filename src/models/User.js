@@ -11,6 +11,13 @@ const userSchema = new mongoose.Schema(
 
     phone: String,
 
+    otherEmail: {
+      type: String,
+      unique: true,
+    },
+
+    otherPhone: String,
+
     password: String,
 
     role: {
@@ -18,8 +25,6 @@ const userSchema = new mongoose.Schema(
       enum: ["buyer", "supplier"],
       default: "buyer",
     },
-
-    company: String,
   },
   { timestamps: true }
 );

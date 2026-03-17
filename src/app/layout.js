@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
       <body className="bg-gray-50">
         <ReduxProvider>
           <Navbar />
-          <Toaster position="top-right" />
+          <Toaster position="top-center" />
           {children}
           <Footer />
         </ReduxProvider>

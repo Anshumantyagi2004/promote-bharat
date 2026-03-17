@@ -11,7 +11,7 @@ export default function SellerRegister() {
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
-    company: "",
+    // company: "",
     email: "",
     phone: "",
     password: "",
@@ -57,13 +57,13 @@ export default function SellerRegister() {
             required
           />
 
-          <input
+          {/* <input
             name="company"
             onChange={handleChange}
             placeholder="Company Name"
             className="w-full border p-3 rounded-lg"
             required
-          />
+          /> */}
 
           <input
             name="email"
