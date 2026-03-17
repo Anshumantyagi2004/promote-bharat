@@ -60,7 +60,7 @@ export default function Navbar() {
                   <p className="font-semibold text-black text-center">{user?.name}</p>
                   <p className="text-sm text-gray-800 text-center">{user?.email}</p>
                 </div>
-                <button onClick={() => router.push(`/${user?.role}/dashboard`)}
+                <button onClick={() => { router.push(`/${user?.role}/dashboard`); setProfileOpen(false) }}
                   className="w-full px-4 py-2 text-left hover:bg-gray-100 text-black">
                   Dashboard
                 </button>

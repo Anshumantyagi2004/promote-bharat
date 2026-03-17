@@ -58,7 +58,7 @@ export default function AdditionalInfoForm({ user }) {
       <Input label="TAN Number" name="tanNumber" value={form.tanNumber} onChange={handleChange} />
 
       <div className="flex items-end justify-end">
-        <button          onClick={handleSubmit}          disabled={loading}
+        <button onClick={handleSubmit} disabled={loading}
           className="px-4 py-2 rounded-md text-white bg-[#0a5183] hover:bg-[#074977]"
         >
           {loading ? "Saving..." : "Save"}

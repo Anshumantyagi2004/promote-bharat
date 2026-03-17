@@ -20,8 +20,8 @@ export default function SupplierSidebar() {
   const menu = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/supplier/dashboard" },
     { name: "Profile", icon: User, path: "/supplier/profile" },
-    { name: "Products", icon: Package, path: "/supplier/products" },
     { name: "Category", icon: FolderTree, path: "/supplier/category" },
+    { name: "Products", icon: Package, path: "/supplier/products" },
     { name: "Settings", icon: Settings, path: "/supplier/settings" },
   ];
 
