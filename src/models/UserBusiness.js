@@ -37,6 +37,10 @@ const businessSchema = new mongoose.Schema(
             enum: ["Manufacturer", "Trader", "Service Provider", "Wholesaler", "Retailer", "Other"],
         },
 
+        businessField: {
+            type: String,
+        },
+
         annualTurnover: {
             type: String, // keep string because ranges like "₹10L - ₹50L"
         },

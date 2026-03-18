@@ -1,36 +1,99 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Search, Eye, Trash2, Edit } from "lucide-react";
 import AddModal from "@/components/Supplier/Category/AddModal";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import CategoryGrid from "@/components/Supplier/Category/CategoryGrid";
 
 export default function Category() {
+  const { user } = useSelector((state) => state.auth);
   const [addModal, setAddModal] = useState(false)
-  const categories = [
-    {
-      id: 1,
-      name: "Electronics",
-      items: 120,
-      image: "https://source.unsplash.com/400x300/?electronics",
-    },
-    {
-      id: 2,
-      name: "Clothing",
-      items: 80,
-      image: "https://source.unsplash.com/400x300/?clothing",
-    },
-    {
-      id: 3,
-      name: "Books",
-      items: 45,
-      image: "https://source.unsplash.com/400x300/?books",
-    },
-    {
-      id: 4,
-      name: "Furniture",
-      items: 32,
-      image: "https://source.unsplash.com/400x300/?furniture",
-    },
-  ];
+  const [categories, setCategories] = useState([]);
+
+  const [form, setForm] = useState({
+    categoryName: "",
+    metaTitle: "",
+    metaDescription: "",
+    categoryDescription: "",
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  }
+
+  const handleSave = async () => {
+    try {
+      const res = await axios.post("/api/category", {
+        ...form,
+        userId: user?._id,
+      });
+
+      if (res.status === 201) {
+        toast.success("Saved");
+        setAddModal(false)
+        setForm()
+        getAllCategories()
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getAllCategories = async () => {
+    try {
+      const res = await axios.get("/api/category", {
+        headers: { "x-user-id": user?._id, },
+      });
+      const data = res.data.data;
+      setCategories(data);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  useEffect(() => {
+    if (!user?._id) return;
+    getAllCategories();
+  }, [user]);
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this category?");
+
+    if (!confirmDelete) return;
+    try {
+      await axios.delete(`/api/category/${id}`);
+      toast.success("Deleted");
+      getAllCategories(); // refresh
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const updateCategory = async (id, data) => {
+    try {
+      const res = await axios.put(`/api/category/${id}`, data);
+
+      if (res.status === 200) {
+        toast.success("Updated");
+        getAllCategories(); // refresh
+        setAddModal(false);
+        setForm()
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleEditClick = (cat) => {
+    setForm(cat);
+    setAddModal(true);
+  };
 
   return (
     <div className="p-4 md:p-6 w-full bg-gray-100">
@@ -53,50 +116,28 @@ export default function Category() {
             <input
               type="text"
               placeholder="Search..."
-              className="input !pl-8"
+              className="input pl-8!"
             />
           </div>
         </div>
       </div>
 
       {/* Category Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {categories.map((cat) => (
-          <div key={cat.id} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group">
-            <div className="h-40 overflow-hidden">
-              <img
-                src={cat.image}
-                alt={cat.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-              />
-            </div>
-
-            {/* Content */}
-            <div className="p-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {cat.name}
-              </h2>
-
-              {/* Actions */}
-              <div className="mt-2 flex justify-between items-center">
-                <button className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-base">
-                  <Edit size={17} />
-                  Edit
-                </button>
-
-                <button className="flex items-center gap-1 text-red-500 hover:text-red-600 text-base">
-                  <Trash2 size={17} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <CategoryGrid
+        categories={categories}
+        handleEditClick={handleEditClick}
+        handleDelete={handleDelete} />
 
       <AddModal
         open={addModal}
-        onClose={() => setAddModal(false)}
+        onClose={() => { setAddModal(false); setForm() }}
+        handleChange={handleChange}
+        form={form}
+        handleSave={() =>
+          form?._id
+            ? updateCategory(form._id, form)
+            : handleSave()
+        }
       />
     </div>
   );

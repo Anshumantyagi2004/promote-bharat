@@ -6,11 +6,8 @@ import { cookies } from "next/headers";
 
 export async function POST(req) {
   try {
-
     await connectDB();
-
     const { email, password } = await req.json();
-
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -21,7 +18,6 @@ export async function POST(req) {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return Response.json(
         { success: false, message: "Invalid password" },
@@ -36,7 +32,6 @@ export async function POST(req) {
     );
 
     const cookieStore = await cookies();
-
     cookieStore.set({
       name: "promote_bharat_token",
       value: token,
@@ -54,11 +49,8 @@ export async function POST(req) {
         role: user.role,
       },
     });
-
   } catch (error) {
-
     console.log(error);
-
     return Response.json({
       success: false,
       message: "Server error",

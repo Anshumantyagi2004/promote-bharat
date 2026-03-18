@@ -11,6 +11,7 @@ import {
     IndianRupee,
     Users,
 } from "lucide-react";
+import { ownershipTypes, businessTypes, businessField, employeNumber } from "@/Data/data";
 
 export default function BusinessForm({ user, setBusinessDetails }) {
     const [loading, setLoading] = useState(false);
@@ -22,6 +23,7 @@ export default function BusinessForm({ user, setBusinessDetails }) {
         gstNumber: "",
         establishedDate: "",
         ownershipType: "",
+        businessField:"",
         businessType: "",
         annualTurnover: "",
         numberOfEmployees: "",
@@ -90,29 +92,114 @@ export default function BusinessForm({ user, setBusinessDetails }) {
 
             <Input label="Established Date" type="date" icon={<Calendar1 size={18} />} name="establishedDate" value={form.establishedDate} onChange={handleChange} />
 
-            <Input label="Ownership Type" icon={<User size={18} />} name="ownershipType" value={form.ownershipType} onChange={handleChange} />
+            <div>
+                <label className="label">Ownership Type</label>
+                <div className="relative">
+                    <div className="icon top-2.5!">
+                        <User size={18} />
+                    </div>
+                    <select
+                        name="ownershipType"
+                        value={form?.ownershipType}
+                        onChange={handleChange}
+                        className="input pl-8!"
+                    >
+                        <option value="">Ownership Type</option>
+                        {ownershipTypes.map((item) => (
+                            <option key={item} value={item}>
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
-            <Input label="Business Type" icon={<Building size={18} />} name="businessType" value={form.businessType} onChange={handleChange} />
+            <div>
+                <label className="label">Business Field</label>
+                <div className="relative">
+                    <div className="icon top-2.5!">
+                        <Building size={18} />
+                    </div>
+                    <select
+                        name="businessField"
+                        value={form?.businessField}
+                        onChange={handleChange}
+                        className="input pl-8!"
+                    >
+                        <option value="">Business Field</option>
+                        {businessField.map((item) => (
+                            <option key={item} value={item}>
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label className="label">Business Type</label>
+                <div className="relative">
+                    <div className="icon top-2.5!">
+                        <Building size={18} />
+                    </div>
+                    <select
+                        name="businessType"
+                        value={form?.businessType}
+                        onChange={handleChange}
+                        className="input pl-8!"
+                    >
+                        <option value="">Business Type</option>
+                        {businessTypes.map((item) => (
+                            <option key={item} value={item}>
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label className="label">Number of Employees</label>
+                <div className="relative">
+                    <div className="icon top-2.5!">
+                        <Users size={18} />
+                    </div>
+                    <select
+                        name="numberOfEmployees"
+                        value={form?.numberOfEmployees}
+                        onChange={handleChange}
+                        className="input pl-8!"
+                    >
+                        <option value="">Select Employees</option>
+                        {employeNumber.map((item) => (
+                            <option key={item} value={item}>
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {/* <Input label="Number of Employees" icon={<Users size={18} />} name="numberOfEmployees" value={form.numberOfEmployees} onChange={handleChange} /> */}
 
             <Input label="Annual Turnover" icon={<IndianRupee size={17} />} name="annualTurnover" value={form.annualTurnover} onChange={handleChange} />
-
-            <Input label="Number of Employees" icon={<Users size={18} />} name="numberOfEmployees" value={form.numberOfEmployees} onChange={handleChange} />
 
             <div>
                 <label className="label">Business Address</label>
                 <div className="relative">
                     <MapPin size={18} className="icon" />
-                    <textarea
+                    <input
                         placeholder="Enter Business Address"
                         name="address"
+                        // row={1}
                         value={form.address}
                         onChange={handleChange}
-                        className="input !pl-8"
+                        className="input pl-8!"
                     />
                 </div>
             </div>
 
-            <div className="flex items-center md:mt-5 justify-end">
+            <div className="flex items-center md:col-span-2 justify-end">
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
@@ -132,7 +219,7 @@ function Input({ label, icon, type = "text", ...props }) {
             <label className="label">{label}</label>
             <div className="relative">
                 <div className="icon">{icon}</div>
-                <input type={type} className="input !pl-8" {...props} placeholder={label} />
+                <input type={type} className="input pl-8!" {...props} placeholder={label} />
             </div>
         </div>
     );

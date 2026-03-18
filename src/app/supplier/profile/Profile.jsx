@@ -97,8 +97,8 @@ export default function Profile() {
   }, [user, editModal]);
 
   const getInitial = (name) => {
-        return name ? name.charAt(0).toUpperCase() : "U";
-    };
+    return name ? name.charAt(0).toUpperCase() : "U";
+  };
 
   return (
     <div className="p-4 md:p-6 w-full bg-gray-100">
@@ -135,13 +135,13 @@ export default function Profile() {
               <Phone size={18} className="text-[#0a5183]" /> {user?.phone || "-"}
             </p>
             <p className="flex items-center gap-2">
-              <Phone size={18}className="text-[#0a5183]" /> {user?.otherPhone || "-"}
+              <Phone size={18} className="text-[#0a5183]" /> {user?.otherPhone || "-"}
             </p>
             <p className="flex items-center gap-2 lg:col-span-2">
-              <Mail size={18}className="text-[#0a5183]" /> {user?.email || "-"}
+              <Mail size={18} className="text-[#0a5183]" /> {user?.email || "-"}
             </p>
             <p className="flex items-center gap-2 lg:col-span-2">
-              <Mail size={18}className="text-[#0a5183]" /> {user?.otherEmail || "-"}
+              <Mail size={18} className="text-[#0a5183]" /> {user?.otherEmail || "-"}
             </p>
           </div>
           <div className="flex justify-center gap-5 pt-3 border-t border-t-gray-300 mt-3">
