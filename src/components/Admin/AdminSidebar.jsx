@@ -12,15 +12,15 @@ import {
   X
 } from "lucide-react";
 
-export default function SupplierSidebar() {
+export default function AdminSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   const menu = [
-    { name: "Dashboard", icon: LayoutDashboard, path: "/supplier/dashboard" },
-    { name: "Profile", icon: User, path: "/supplier/profile" },
-    { name: "Products", icon: Package, path: "/supplier/products" },
-    { name: "Settings", icon: Settings, path: "/supplier/settings" },
+    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+    { name: "Profile", icon: User, path: "/admin/profile" },
+    { name: "Category", icon: Package, path: "/admin/category" },
+    { name: "Settings", icon: Settings, path: "/admin/settings" },
   ];
 
   return (

@@ -1,4 +1,4 @@
-import {connectDB} from "@/config/db";
+import { connectDB } from "@/config/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -9,7 +9,7 @@ export async function POST(req) {
     await connectDB();
     const { email, password } = await req.json();
     const user = await User.findOne({ email });
-
+    // console.log(user)
     if (!user) {
       return Response.json(
         { success: false, message: "User not found" },
@@ -26,7 +26,7 @@ export async function POST(req) {
     }
 
     const token = jwt.sign(
-      { id: user._id,  role: user.role },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );

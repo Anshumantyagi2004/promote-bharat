@@ -32,7 +32,7 @@ export async function middleware(req) {
 
   // 🔴 NOT LOGGED IN → protect dashboard routes
   if (!user) {
-    if (pathname.startsWith("/buyer") || pathname.startsWith("/supplier")) {
+    if (pathname.startsWith("/buyer") || pathname.startsWith("/supplier") || pathname.startsWith("/admin")) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
     return NextResponse.next();
@@ -51,6 +51,12 @@ export async function middleware(req) {
     );
   }
 
+  if (pathname.startsWith("/admin") && user.role !== "admin") {
+    return NextResponse.redirect(
+      new URL(`/${user.role}/dashboard`, req.url)
+    );
+  }
+
   return NextResponse.next();
 }
 
@@ -60,5 +66,6 @@ export const config = {
     "/login",
     "/buyer/:path*",
     "/supplier/:path*",
+    "/admin/:path*",
   ],
 };

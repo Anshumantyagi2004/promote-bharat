@@ -2,29 +2,49 @@ import { connectDB } from "@/config/db";
 import Category from "@/models/Category";
 import { NextResponse } from "next/server";
 
-export const getUserId = (req) => {
-  return req.headers.get("x-user-id");
-};
+// ✅ slug function
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
+// ✅ CREATE
 export async function POST(req) {
   try {
     await connectDB();
-    const body = await req.json();
-    const { categoryName, metaTitle, metaDescription, categoryDescription, userId } = body;
 
-    if (!categoryName || !userId) {
+    const body = await req.json();
+    const {
+      name,
+      metaTitle,
+      metaDescription,
+      categoryDescription,
+      industryId,
+      parentCategoryId,
+    } = body;
+
+    // validation
+    if (!name || !industryId) {
       return NextResponse.json(
-        { message: "Required fields missing" },
+        { message: "Name & Industry required" },
         { status: 400 }
       );
     }
 
+    const slug = slugify(name);
+
     const category = await Category.create({
-      categoryName,
+      name,
+      slug,
       metaTitle,
       metaDescription,
       categoryDescription,
-      userId,
+      industryId,
+      parentCategoryId: parentCategoryId || null,
     });
 
     return NextResponse.json(
@@ -39,22 +59,15 @@ export async function POST(req) {
   }
 }
 
-export async function GET(req) {
+// ✅ GET ALL
+export async function GET() {
   try {
     await connectDB();
 
-    const userId = getUserId(req);
-
-    if (!userId) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 401 }
-      );
-    }
-
-    const categories = await Category.find({ userId }).sort({
-      createdAt: -1,
-    });
+    const categories = await Category.find()
+      .populate("industryId", "name")
+      .populate("parentCategoryId", "name")
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({ data: categories });
   } catch (error) {

@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
 
     otherEmail: {
       type: String,
-      unique: true,
+      // unique: true,
     },
 
     otherPhone: String,
@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["buyer", "supplier"],
+      enum: ["buyer", "supplier","admin"],
       default: "buyer",
     },
   },

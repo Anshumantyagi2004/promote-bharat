@@ -27,8 +27,7 @@ export const businessField = [
     "Chemicals, Dyes & Solvents",
     "Mechanical Parts & Spares",
     "Lab Instruments & Supplies",
-    // "Lab Instruments & Supplies",
-    // "Lab Instruments & Supplies",
+    "Books & Stationery",
 ];
 
 export const employeNumber = [
@@ -36,3 +35,18 @@ export const employeNumber = [
     "11 to 25 People",
     "26 to 30 People",
 ];
+
+export const mainCategory =[
+    "Office Stationery & Calculator",
+    "Files, Folders & Notebooks",
+    "Crayon, Painting Brush & Craft Tools",
+];
+
+export const subCategory =[
+"Office Stationery",
+"Desk Accessories",
+"Scissors",
+"Pen Stand",
+"Calculator",
+"Paper Weight",
+]
