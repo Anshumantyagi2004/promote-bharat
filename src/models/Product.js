@@ -1,0 +1,75 @@
+import mongoose from "mongoose";
+
+const productSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    supplierId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+
+    subCategoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+
+    price: {
+      type: Number,
+    },
+
+    priceType: {
+      type: String,
+      enum: ["fixed", "starting", "range", "on_request"],
+      default: "on_request",
+    },
+
+    minOrderQty: {
+      type: Number,
+      default: 1,
+    },
+
+    description: {
+      type: String,
+      trim: true,
+    },
+
+    specifications: [
+      {
+        key: String,
+        value: String,
+      },
+    ],
+
+    // 🏢 Business Info
+    // deliveryTime: String,
+    // packagingDetails: String,
+    // supplyAbility: String,
+    // paymentTerms: String,
+
+    // 🔍 SEO
+    tags: [String],
+    metaTitle: String,
+    metaDescription: String,
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Product", productSchema);

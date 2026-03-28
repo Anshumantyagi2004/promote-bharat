@@ -45,6 +45,7 @@ export default function Navbar() {
             alt="Promote Bharat"
             width={200}
             height={200}
+            className="object-contain h-16 w-50"
           />
         </Link>
         {user ? (

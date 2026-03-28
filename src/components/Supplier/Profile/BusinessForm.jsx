@@ -15,7 +15,7 @@ import { ownershipTypes, businessTypes, businessField, employeNumber } from "@/D
 
 export default function BusinessForm({ user, setBusinessDetails }) {
     const [loading, setLoading] = useState(false);
-    const [fetching, setFetching] = useState(true);
+    const [industry, setIndustry] = useState([]);
 
     const [form, setForm] = useState({
         companyName: "",
@@ -23,12 +23,24 @@ export default function BusinessForm({ user, setBusinessDetails }) {
         gstNumber: "",
         establishedDate: "",
         ownershipType: "",
-        businessField:"",
+        businessField: "",
         businessType: "",
         annualTurnover: "",
         numberOfEmployees: "",
         address: "",
     });
+
+    const fetchIndustryList = async () => {
+        try {
+            const res = await axios.get("/api/industry/list");
+            if (res?.data?.data) {
+                setIndustry(res?.data?.data)
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to load data");
+        }
+    };
 
     const fetchBusiness = async () => {
         try {
@@ -48,14 +60,13 @@ export default function BusinessForm({ user, setBusinessDetails }) {
         } catch (error) {
             console.log(error);
             toast.error("Failed to load data");
-        } finally {
-            setFetching(false);
         }
     };
 
     useEffect(() => {
         if (user?._id) {
             fetchBusiness();
+            fetchIndustryList();
         }
     }, [user]);
 
@@ -127,9 +138,9 @@ export default function BusinessForm({ user, setBusinessDetails }) {
                         className="input pl-8!"
                     >
                         <option value="">Business Field</option>
-                        {businessField.map((item) => (
-                            <option key={item} value={item}>
-                                {item}
+                        {industry.map((item, idx) => (
+                            <option key={idx} value={item?.name}>
+                                {item?.name}
                             </option>
                         ))}
                     </select>

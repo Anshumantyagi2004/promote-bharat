@@ -1,5 +1,5 @@
-import { Edit, Plus, Trash2 } from "lucide-react";
-import React from "react";
+import { useState } from "react";
+import { Edit, Plus, Trash2, ChevronDown } from "lucide-react";
 
 export default function CategoryGrid({
   setForm,
@@ -10,121 +10,140 @@ export default function CategoryGrid({
   handleEditClick,
   handleDelete,
 }) {
+  const [expanded, setExpanded] = useState({});
+
+  const toggleViewMore = (id) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {industries.map((item) => (
-        <div
-          key={item._id}
-          className="border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all bg-white hover:-translate-y-1"
-        >
-          {/* 🔹 Industry Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#074977]/10 p-2 rounded-lg">
+    <div className="space-y-4">
+      {industries.map((item) => {
+        const showAll = expanded[item._id];
+        const categories = showAll ? item.mainCategory : item.mainCategory?.slice(0, 6);
+
+        return (
+          <div key={item._id} className="flex border border-gray-100 rounded-xl bg-white overflow-hidden shadow-sm">
+            <div className="w-1/4 border-r border-gray-300 p-4 flex flex-col justify-between">
+              <div className="flex flex-col items-center text-center gap-3">
                 <img
                   src={item?.imageUrl}
-                  alt="No image"
-                  className="w-6 h-6"
+                  className="w-20 h-20 object-contain"
                 />
               </div>
 
-              <h2 className="font-semibold text-lg text-gray-800">
-                {item.name}
-              </h2>
-            </div>
+              <div className="flex flex-col justify-center gap-2 mt-4">
+                <h2 className="font-semibold text-center text-gray-900 text-lg">
+                  {item.name}
+                </h2>
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      setForm({ industryId: item._id });
+                      setAddModal(true);
+                    }}
+                    className="icon-btn-blue"
+                  >
+                    <Plus size={16} />
+                  </button>
 
-            <div className="flex items-center gap-1">
-              {/* ➕ Add Main Category */}
-              <button
-                onClick={() => {
-                  setForm({ industryId: item._id });
-                  setAddModal(true);
-                }}
-                className="flex items-center justify-center w-7 h-7 rounded-full 
-                bg-[#0a5183]/10 text-[#0a5183] hover:bg-[#094875] hover:text-white transition"
-              >
-                <Plus size={16} />
-              </button>
+                  <button
+                    onClick={() => handleEditIndustry(item)}
+                    className="icon-btn-red"
+                  >
+                    <Edit size={16} />
+                  </button>
 
-              <button
-                onClick={() => handleEditIndustry(item)}
-                className="flex items-center justify-center w-7 h-7 rounded-full 
-                bg-[#D01132]/10 text-[#D01132] hover:bg-[#D01132] hover:text-white transition"
-              >
-                <Edit size={16} />
-              </button>
-
-              <button
-                onClick={() => deleteIndustry(item._id)}
-                className="flex items-center justify-center w-7 h-7 rounded-full 
-                bg-[#D01132]/10 text-red-600 hover:bg-red-500 hover:text-white transition"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-
-          {/* 🔹 Categories */}
-          <div className="space-y-4">
-            {item?.mainCategory?.map((cat) => (
-              <div key={cat._id}>
-                <div className="flex items-center justify-between">
-                  <p className="font-medium text-gray-700">
-                    {cat.name}
-                  </p>
-
-                  <div className="flex gap-1 items-center">
-                    {/* ➕ Add Subcategory */}
-                    <button
-                      onClick={() => {
-                        setForm({
-                          industryId: item._id,
-                          parentCategoryId: cat._id,
-                        });
-                        setAddModal(true);
-                      }}
-                      className="flex items-center justify-center w-7 h-7 rounded-full 
-                      bg-[#D01132]/10 text-[#D01132] hover:bg-[#D01132] hover:text-white transition"
-                    >
-                      <Plus size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => handleEditClick(cat)}
-                      className="flex items-center justify-center w-7 h-7 rounded-full 
-                      bg-[#0a5183]/10 text-[#0a5183] hover:bg-[#094875] hover:text-white transition"
-                    >
-                      <Edit size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(cat._id)}
-                      className="flex items-center justify-center w-7 h-7 rounded-full 
-                      bg-[#D01132]/10 text-red-600 hover:bg-red-500 hover:text-white transition"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* 🔹 Sub Categories */}
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {cat.subCategory?.map((sub) => (
-                    <span
-                      key={sub._id}
-                      className="text-xs px-3 py-1 rounded-full bg-[#074977]/10 text-[#074977] 
-                      hover:bg-[#D01132]/10 hover:text-[#D01132] transition cursor-pointer"
-                      onClick={() => handleEditClick(sub)} // 🔥 click to edit
-                    >
-                      {sub.name}
-                    </span>
-                  ))}
+                  <button
+                    onClick={() => deleteIndustry(item._id)}
+                    className="icon-btn-danger"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      ))}
+            </div>
+
+            <div className="w-3/4 p-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {categories?.map((cat) => (
+                  <div key={cat._id} className="border border-gray-300 rounded-lg p-3 hover:shadow-md hover:-translate-y-[2px] transition">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="font-medium text-gray-900 text-base">
+                        {cat.name}
+                      </p>
+
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => {
+                            setForm({
+                              industryId: item._id,
+                              parentCategoryId: cat._id,
+                            });
+                            setAddModal(true);
+                          }}
+                          className="mini-btn-blue"
+                        >
+                          <Plus size={16} />
+                        </button>
+
+                        <button
+                          onClick={() => handleEditClick(cat)}
+                          className="mini-btn-blue"
+                        >
+                          <Edit size={16} />
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(cat._id)}
+                          className="mini-btn-danger"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <ul className="text-sm space-y-1 grid grid-cols-2 gap-2">
+                      {cat.subCategory?.length > 0 ? (
+                        cat.subCategory.map((sub) => (
+                          <li key={sub._id} onClick={() => handleEditClick(sub)}
+                            className="flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-[#074977]/5 text-gray-800 hover:bg-[#074977]/15 hover:text-[#074977] cursor-pointer transition"
+                          >
+                            <span className="text-[#074977]">●</span>
+                            {sub.name}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-gray-600 items-center">
+                          No subcategories
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              {item.mainCategory?.length > 6 && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => toggleViewMore(item._id)}
+                    className="flex items-center gap-1 text-sm text-[#074977] hover:underline"
+                  >
+                    {showAll ? "View Less" : "View More"}
+                    <ChevronDown
+                      size={14}
+                      className={`transition ${showAll ? "rotate-180" : ""
+                        }`}
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>);
+      })}
     </div>
   );
 }
