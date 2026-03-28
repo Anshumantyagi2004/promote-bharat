@@ -67,9 +67,7 @@ export default function Category() {
 
   const getAllCategories = async () => {
     try {
-      const res = await axios.get("/api/category", {
-        headers: { "x-user-id": user?._id, },
-      });
+      const res = await axios.get("/api/category");
       const data = res.data.data;
       setCategories(data);
     } catch (error) {

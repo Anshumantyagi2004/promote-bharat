@@ -59,17 +59,36 @@ export async function POST(req) {
   }
 }
 
-// ✅ GET ALL
-export async function GET() {
+export async function GET(req) {
   try {
     await connectDB();
 
-    const categories = await Category.find()
-      .populate("industryId", "name")
-      .populate("parentCategoryId", "name")
-      .sort({ createdAt: -1 });
+    const { searchParams } = new URL(req.url);
+
+    const type = searchParams.get("type"); // main | sub
+    const parentId = searchParams.get("parentId");
+
+    let filter = {};
+
+    // ✅ Main Categories
+    if (type === "main") {
+      filter.parentCategoryId = null;
+    }
+
+    // ✅ Sub Categories (all)
+    if (type === "sub" && !parentId) {
+      filter.parentCategoryId = { $ne: null };
+    }
+
+    // ✅ Sub Categories by Parent
+    if (parentId) {
+      filter.parentCategoryId = parentId;
+    }
+
+    const categories = await Category.find(filter).sort({ createdAt: -1 });
 
     return NextResponse.json({ data: categories });
+
   } catch (error) {
     return NextResponse.json(
       { message: "Error", error: error.message },

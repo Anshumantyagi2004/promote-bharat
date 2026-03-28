@@ -1,6 +1,8 @@
+import { Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
-export default function ProductGrid({ products = [], loading = true }) {
+export default function ProductGrid({ products = [], loading, handleEdit, handleDelete }) {
     return (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 bg-white p-4 rounded-lg shadow">
             {loading &&
@@ -14,21 +16,30 @@ export default function ProductGrid({ products = [], loading = true }) {
 
             {!loading &&
                 products.map((item) => (
-                    <div
-                        key={item._id}
-                        className="bg-white p-4 rounded-xl shadow hover:shadow-md transition"
-                    >
-                        <div className="h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-gray-400">
+                    <div key={item?._id} className="bg-white p-2 rounded-xl shadow hover:shadow-md transition border border-gray-200">
+                        <div className="h-40 bg-gray-100 rounded mb-2 flex items-center justify-center text-gray-400">
                             Image
                         </div>
 
-                        <h3 className="font-semibold text-gray-800">
+                        <Link href={`/supplier/products/${item?.slug}`} className="font-bold text-black text-lg px-1.5">
                             {item.name}
-                        </h3>
+                        </Link>
 
-                        <p className="text-sm text-gray-500">
-                            ₹ {item.price || "Get Best Price"}
-                        </p>
+                        <div className="flex items-center justify-between px-1.5">
+                            <p className="text-base font-semibold text-gray-800">
+                                ₹ {item.price || "Get Best Price"}
+                            </p>
+
+                            <div className="flex gap-2">
+                                <button onClick={() => handleEdit(item)} className="mini-btn-blue">
+                                    <Edit size={18} />
+                                </button>
+
+                                <button onClick={() => handleDelete(item._id)} className="mini-btn-danger">
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 ))}
         </div>
