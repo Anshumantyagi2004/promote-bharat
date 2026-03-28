@@ -1,14 +1,12 @@
 "use client"
+import ProductForm from '@/components/Supplier/Product/ProductForm';
+import ProductGrid from '@/components/Supplier/Product/ProductGrid';
 import { ArrowLeft, Plus, Search } from 'lucide-react'
-import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
-
-const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false, });
 
 export default function Products() {
   const [isAddActive, setAddActive] = useState(false)
   const [activeTab, setActiveTab] = useState("basic");
-  const editor = useRef(null);
   const [description, setDescription] = useState("");
   const tabs = [
     { id: "basic", label: "Basic Info" },
@@ -94,113 +92,38 @@ export default function Products() {
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white rounded-xl shadow p-2 flex flex-wrap gap-1.5">
             {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${activeTab === tab.id
-                    ? "bg-[#D01132] text-white"
-                    : "hover:bg-[#fbe9ec] text-[#D01132] border border-[#D01132]"
-                  }`}
-              >
+              ${activeTab === tab.id ? "bg-[#D01132] text-white" : "hover:bg-[#fbe9ec] text-[#D01132] border border-[#D01132]"}`}>
                 {tab.label}
               </button>
             ))}
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow">
-            {/* BASIC */}
-            {activeTab === "basic" && (
-              <div className="grid md:grid-cols-2 gap-4">
-                <input className="input" placeholder="Product Name" />
-                <input className="input" placeholder="Brand Name" />
-              </div>
-            )}
-
-            {/* CATEGORY */}
-            {activeTab === "category" && (
-              <div className="grid md:grid-cols-2 gap-4">
-                <select className="input">
-                  <option>Select Category</option>
-                </select>
-                <select className="input">
-                  <option>Select Sub Category</option>
-                </select>
-              </div>
-            )}
-
-            {/* PRICE */}
-            {activeTab === "price" && (
-              <div className="grid md:grid-cols-2 gap-4">
-                <input type="number" className="input" placeholder="Price" />
-                <select className="input">
-                  <option>Fixed</option>
-                  <option>Starting</option>
-                  <option>On Request</option>
-                </select>
-                <input className="input" placeholder="MOQ" />
-              </div>
-            )}
-
-            {/* DESCRIPTION */}
-            {activeTab === "description" && (
-              <div>
-                <label className="label">Description</label>
-
-                <JoditEditor
-                  ref={editor}
-                  value={description}
-                  onChange={(newContent) => setDescription(newContent)}
-                  config={{
-                    readonly: false,
-                    height: 300,
-                    placeholder: "Write product description...",
-                  }}
-                />
-              </div>
-            )}
-
-            {/* SPEC */}
-            {activeTab === "specifications" && (
-              <div>
-                <div className="flex justify-between mb-3">
-                  <p className="font-medium">Specifications</p>
-                  <button className="text-sm text-blue-600">+ Add</button>
-                </div>
-                <div className="grid md:grid-cols-2 gap-3">
-                  <input className="input" placeholder="Key" />
-                  <input className="input" placeholder="Value" />
-                </div>
-              </div>
-            )}
-
-            {/* OTHER */}
-            {activeTab === "other" && (
-              <div className="grid md:grid-cols-2 gap-4">
-                <input className="input" placeholder="Delivery Time" />
-                <input className="input" placeholder="Payment Terms" />
-              </div>
-            )}
+            <ProductForm
+              activeTab={activeTab}
+              description={description}
+              setDescription={setDescription}
+            />
 
             {/* BUTTONS */}
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setAddActive(false)}
-                className="px-5 py-2 border rounded-lg"
+                className="px-5 py-2 rounded-lg bg-[#D01132] text-white"
               >
                 Cancel
               </button>
               <button className="px-6 py-2 bg-[#0a5183] text-white rounded-lg">
-                Save Product
+                Save
               </button>
             </div>
           </div>
         </div>
       </div>
     ) : (
-      <div className="bg-white p-6 rounded-xl shadow-sm text-center text-gray-500">
-        No products found
-      </div>
+      <ProductGrid />
     )}
 
   </div>)

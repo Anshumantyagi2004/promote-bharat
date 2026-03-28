@@ -58,11 +58,10 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
-    // 🏢 Business Info
-    // deliveryTime: String,
-    // packagingDetails: String,
-    // supplyAbility: String,
-    // paymentTerms: String,
+    deliveryTime: String,
+    packagingDetails: String,
+    supplyAbility: String,
+    paymentTerms: String,
 
     // 🔍 SEO
     tags: [String],
