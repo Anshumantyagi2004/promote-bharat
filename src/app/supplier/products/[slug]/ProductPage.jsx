@@ -11,6 +11,7 @@ import {
   PackageOpen,
   Factory,
   Info,
+  IndianRupee,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -41,9 +42,9 @@ export default function ProductPage({ slug }) {
 
   return (
     <div className="p-6 w-full bg-gray-100 space-y-6">
-      <div className="bg-white rounded-xl shadow p-6 grid md:grid-cols-2 gap-6">
+      <div className="bg-white rounded-2xl shadow-md p-6 grid md:grid-cols-2 gap-8">
         <div>
-          <div className="bg-gray-100 h-80 rounded flex items-center justify-center mb-3 border border-gray-200">
+          <div className="bg-gray-50 h-96 rounded-xl flex items-center justify-center mb-4 border border-gray-200">
             <img
               src={images[activeImg]}
               className="h-full object-contain"
@@ -51,90 +52,45 @@ export default function ProductPage({ slug }) {
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-3 flex-wrap">
             {images.map((img, i) => (
               <img
                 key={i}
                 src={img}
                 onClick={() => setActiveImg(i)}
-                className={`w-16 h-16 object-cover rounded cursor-pointer border ${activeImg === i ? "border-blue-500" : ""}`}
+                className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 transition ${activeImg === i
+                  ? "border-[#0a5183] scale-105"
+                  : "border-gray-200 hover:border-gray-400"
+                  }`}
               />
             ))}
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
-          <h1 className="text-2xl font-bold text-black">
+        {/* RIGHT: DETAILS */}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-gray-900 leading-snug">
             {product.name}
           </h1>
 
-          <p className="text-xl text-[#0a5183] font-semibold flex items-center gap-2">
-            <BadgeIndianRupee size={20} />
-            {product.price || "Add Price"}/Piece
-          </p>
-          {/* INFO */}
+          <div className="bg-[#f0f7fc] border border-[#cfe6f5] rounded-xl p-4 flex items-center gap-1">
+            <div className="flex items-center gap-2 text-[#0a5183] text-2xl font-bold">
+              <IndianRupee size={22} />
+              {product.price || "Add Price"}
+            </div>
+            <span className="text-sm text-gray-600">/Piece</span>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <Tag className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Category:</span>
-              <span>{product?.categoryId?.name || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <Layers className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Sub Category:</span>
-              <span>{product?.subCategoryId?.name || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <Boxes className="text-[#0a5183]" size={18} />
-              <span className="font-medium">MOQ:</span>
-              <span>{product?.minOrderQty || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <BadgeIndianRupee className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Price Type:</span>
-              <span>{product?.priceType || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <Truck className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Delivery:</span>
-              <span>{product?.deliveryTime || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <CreditCard className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Payment:</span>
-              <span>{product?.paymentTerms || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <PackageOpen className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Packaging:</span>
-              <span>{product?.packagingDetails || "-"}</span>
-            </div>
-
-            <div className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-              <Factory className="text-[#0a5183]" size={18} />
-              <span className="font-medium">Supply:</span>
-              <span>{product?.supplyAbility || "-"}</span>
-            </div>
-
-            <div className="flex sm:cols-span-2 items-start gap-2 p-2 rounded-md hover:bg-gray-50 col-span-1 sm:col-span-2">
-              <Info className="text-[#0a5183] mt-1" size={18} />
-              <div>
-                <p>
-                  <span className="font-medium">Meta Title:</span>{" "}
-                  {product?.metaTitle || "-"}
-                </p>
-                <p>
-                  <span className="font-medium">Meta Description:</span>{" "}
-                  {product?.metaDescription || "-"}
-                </p>
-              </div>
-            </div>
+            <InfoItem icon={Tag} label="Brand" value={product?.brandName} />
+            <InfoItem icon={Tag} label="Category" value={product?.categoryId?.name} />
+            <InfoItem icon={Layers} label="Sub Category" value={product?.subCategoryId?.name} />
+            <InfoItem icon={Boxes} label="MOQ" value={product?.minOrderQty} />
+            <InfoItem icon={BadgeIndianRupee} label="Price Type" value={product?.priceType} />
+            <InfoItem icon={Truck} label="Delivery" value={product?.deliveryTime} />
+            <InfoItem icon={CreditCard} label="Payment" value={product?.paymentTerms} />
+            <InfoItem icon={PackageOpen} label="Packaging" value={product?.packagingDetails} />
+            <InfoItem icon={Factory} label="Supply" value={product?.supplyAbility} />
           </div>
         </div>
       </div>
@@ -171,6 +127,24 @@ export default function ProductPage({ slug }) {
       </div>
 
       <ReviewSection />
+    </div>
+  );
+}
+
+function InfoItem({ icon: Icon, label, value }) {
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:shadow-sm transition">
+      <div className="bg-[#e6f2f9] text-[#0a5183] p-2 rounded-md">
+        <Icon size={18} />
+      </div>
+
+      {/* Content */}
+      <div className="text-sm">
+        <p className="text-gray-600">{label}</p>
+        <p className="font-medium text-gray-900">
+          {value || "-"}
+        </p>
+      </div>
     </div>
   );
 }

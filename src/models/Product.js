@@ -7,6 +7,11 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    
+    brandName: {
+      type: String,
+      trim: true,
+    },
 
     slug: {
       type: String,
@@ -62,9 +67,6 @@ const productSchema = new mongoose.Schema(
     packagingDetails: String,
     supplyAbility: String,
     paymentTerms: String,
-
-    // 🔍 SEO
-    tags: [String],
     metaTitle: String,
     metaDescription: String,
   },

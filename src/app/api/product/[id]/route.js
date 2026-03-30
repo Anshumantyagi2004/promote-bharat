@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/config/db";
 import Product from "@/models/Product";
 
+// ✅ slug function
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 // ✅ UPDATE
 export async function PUT(req, { params }) {
   try {
@@ -9,15 +19,54 @@ export async function PUT(req, { params }) {
     const { id } = await params;
     const body = await req.json();
 
+    const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      return NextResponse.json({
+        success: false,
+        error: "Product not found",
+      });
+    }
+
+    // 🔥 IF NAME CHANGED → UPDATE SLUG
+    if (body.name && body.name !== existingProduct.name) {
+      let slug = slugify(body.name);
+
+      let existing = await Product.findOne({
+        slug,
+        _id: { $ne: id }, // exclude current product
+      });
+
+      let count = 1;
+
+      while (existing) {
+        slug = `${slugify(body.name)}-${count}`;
+        existing = await Product.findOne({
+          slug,
+          _id: { $ne: id },
+        });
+        count++;
+      }
+
+      body.slug = slug;
+    }
+
+    // 🔥 UPDATE
     const updated = await Product.findByIdAndUpdate(
       id,
       body,
       { new: true }
     );
 
-    return NextResponse.json({ success: true, data: updated });
+    return NextResponse.json({
+      success: true,
+      data: updated,
+    });
+
   } catch (err) {
-    return NextResponse.json({ success: false, error: err.message });
+    return NextResponse.json({
+      success: false,
+      error: err.message,
+    });
   }
 }
 

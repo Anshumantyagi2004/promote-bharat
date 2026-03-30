@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import NeedHelpModal from '@/components/Supplier/Product/NeedHelpModal';
 
 export default function Products() {
   const { user } = useSelector((state) => state.auth);
@@ -16,6 +17,7 @@ export default function Products() {
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [needHelp, setNeedHelp] = useState(false);
   const tabs = [
     { id: "basic", label: "Basic Info" },
     { id: "category", label: "Category" },
@@ -28,6 +30,7 @@ export default function Products() {
   const [form, setForm] = useState({
     supplierId: user?._id,
     name: "",
+    brandName: "",
     slug: "",
     categoryId: "",
     subCategoryId: "",
@@ -105,6 +108,7 @@ export default function Products() {
   const handleEdit = (item) => {
     setForm({
       name: item.name || "",
+      brandName: item.brandName || "",
       slug: item.slug || "",
       categoryId: item.categoryId || "",
       subCategoryId: item.subCategoryId || "",
@@ -127,15 +131,14 @@ export default function Products() {
 
   const handleDelete = async (id) => {
     const confirmDelete = confirm("Are you sure you want to delete this product?");
-
     if (!confirmDelete) return;
 
     try {
       await axios.delete(`/api/product/${id}`);
-      alert("Product deleted successfully");
+      toast.success("Product deleted successfully");
       getProducts();
     } catch (err) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   };
 
@@ -143,6 +146,7 @@ export default function Products() {
     setForm({
       supplierId: user?._id,
       name: "",
+      brandName: "",
       slug: "",
       categoryId: "",
       subCategoryId: "",
@@ -254,15 +258,24 @@ export default function Products() {
               setForm={setForm}
             />
 
-            <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => { setAddActive(false); resetForm() }} className="px-5 py-2 rounded-lg bg-[#D01132] text-white">
-                Cancel
-              </button>
-              <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-[#0a5183] text-white rounded-lg">
-                {editId ?
-                  saving ? "Updating..." : "Update"
-                  : saving ? "Saving..." : "Save"}
-              </button>
+            <div className="flex justify-between items-center gap-3 mt-6">
+              <div className="items-center">
+                {activeTab == "category" && (
+                  <span onClick={() => setNeedHelp(true)} className='text-blue-600 hover:underline cursor-pointer'>
+                    Need help?
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => { setAddActive(false); resetForm() }} className="px-5 py-2 rounded-lg bg-[#D01132] text-white">
+                  Cancel
+                </button>
+                <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-[#0a5183] text-white rounded-lg">
+                  {editId ?
+                    saving ? "Updating..." : "Update"
+                    : saving ? "Saving..." : "Save"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -275,5 +288,7 @@ export default function Products() {
         handleDelete={handleDelete}
       />
     )}
+
+    <NeedHelpModal open={needHelp} onClose={() => setNeedHelp(false)} />
   </div>)
 }

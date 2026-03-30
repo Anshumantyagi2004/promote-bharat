@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import SelectInput from "@/components/Inputs/SelectInput";
+import Input from "@/components/Inputs/FormInput";
+import SearchableSelect from "@/components/Inputs/SearchInput";
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
@@ -65,10 +68,10 @@ export default function ProductForm({ activeTab, form, setForm }) {
                     />
 
                     <Input
-                        label="Slug"
+                        label="Brand Name"
                         Icon={Tag}
-                        name="slug"
-                        value={form.slug}
+                        name="brandName"
+                        value={form.brandName}
                         onChange={handleChange}
                     />
                 </div>
@@ -77,10 +80,8 @@ export default function ProductForm({ activeTab, form, setForm }) {
             {/* 🔹 CATEGORY */}
             {activeTab === "category" && (
                 <div className="grid md:grid-cols-2 gap-4">
-                    <SelectInput
+                    <SearchableSelect
                         label="Category"
-                        Icon={Layers}
-                        name="categoryId"
                         value={form.categoryId}
                         onChange={handleChange}
                         options={mainCategories.map((c) => ({
@@ -197,7 +198,7 @@ export default function ProductForm({ activeTab, form, setForm }) {
                         onChange={handleChange}
                     />
 
-                    <Input
+                    {/* <Input
                         label="Meta Title"
                         Icon={Tag}
                         name="metaTitle"
@@ -211,7 +212,7 @@ export default function ProductForm({ activeTab, form, setForm }) {
                         name="metaDescription"
                         value={form.metaDescription}
                         onChange={handleChange}
-                    />
+                    /> */}
                 </div>
             )}
         </>
@@ -308,37 +309,6 @@ function Specifications({ form, setForm }) {
                             </div>
                         </div>);
                 })}
-            </div>
-        </div>
-    );
-}
-
-function Input({ label, Icon = IdCard, ...props }) {
-    return (
-        <div>
-            <label className="label">{label}</label>
-            <div className="relative">
-                <Icon size={18} className="icon" />
-                <input className="input pl-8!" placeholder={label} {...props} />
-            </div>
-        </div>
-    );
-}
-
-function SelectInput({ label, Icon = IdCard, options = [], ...props }) {
-    return (
-        <div>
-            <label className="label">{label}</label>
-            <div className="relative">
-                <Icon size={18} className="icon" />
-                <select className="input pl-8!" {...props}>
-                    <option value="">Select {label}</option>
-                    {options.map((opt, i) => (
-                        <option key={i} value={opt.value}>
-                            {opt.label}
-                        </option>
-                    ))}
-                </select>
             </div>
         </div>
     );
