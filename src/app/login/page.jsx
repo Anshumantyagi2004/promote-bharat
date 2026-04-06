@@ -5,6 +5,7 @@ import { Mail, Lock, Smartphone } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function LoginPage() {
     const [otpMode, setOtpMode] = useState(false);
@@ -27,23 +28,19 @@ export default function LoginPage() {
         e.preventDefault();
         if (otpMode) return toast.success("Only Login with Password Working");
         try {
-            const res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            });
-
-            const data = await res.json();
+            const res = await axios.post("/api/auth/login", form);
+            const data = res.data;
             if (!data.success) {
                 toast.error(data.message);
                 return;
             }
-
-            dispatch(setUser(data.user));
-            toast.success("Login Successful");
-            router.push(`/${data.user.role}/dashboard`);
+            const res1 = await fetch("/api/auth/me");
+            const data1 = await res1.json();
+            if (data1.user) {
+                dispatch(setUser(data1.user));
+                toast.success("Login Successful");
+                router.push(`/${data1.user.role}/dashboard`);
+            }
         } catch (error) {
             toast.error("Something went wrong");
         }

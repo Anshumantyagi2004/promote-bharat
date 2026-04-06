@@ -289,6 +289,6 @@ export default function Products() {
       />
     )}
 
-    <NeedHelpModal open={needHelp} onClose={() => setNeedHelp(false)} />
+    <NeedHelpModal open={needHelp} onClose={() => setNeedHelp(false)}user={user} />
   </div>)
 }

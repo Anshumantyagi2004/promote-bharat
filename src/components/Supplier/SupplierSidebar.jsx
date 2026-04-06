@@ -9,7 +9,8 @@ import {
   Package,
   Settings,
   Menu,
-  X
+  X,
+  CircleQuestionMark,
 } from "lucide-react";
 
 export default function SupplierSidebar() {
@@ -20,6 +21,7 @@ export default function SupplierSidebar() {
     { name: "Dashboard", icon: LayoutDashboard, path: "/supplier/dashboard" },
     { name: "Profile", icon: User, path: "/supplier/profile" },
     { name: "Products", icon: Package, path: "/supplier/products" },
+    { name: "Help", icon: CircleQuestionMark, path: "/supplier/help" },
     { name: "Settings", icon: Settings, path: "/supplier/settings" },
   ];
 

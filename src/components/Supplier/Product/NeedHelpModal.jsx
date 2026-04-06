@@ -1,22 +1,75 @@
 import Modal from '@/components/Modal/Modal'
-import React from 'react'
-import { MessageCircle, } from "lucide-react";
+import React, { useState } from 'react'
+import { Captions, MessageCircle, } from "lucide-react";
 import toast from 'react-hot-toast';
+import Input from '@/components/Inputs/FormInput';
+import axios from 'axios';
 
-export default function NeedHelpModal({ open, onClose, }) {
-    const handleSave = () => {
-        toast.success("Under development");
-    }
+export default function NeedHelpModal({ open, onClose, user }) {
+    const [form, setForm] = useState({
+        subject: "",
+        description: "",
+        issueType: "CATEGORY",
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSave = async () => {
+        try {
+            if (!form.subject || !form.description) {
+                return toast.error("All fields are required");
+            }
+            // console.log(form);
+            const res = await axios.post("/api/help", form, {
+                headers: { "x-user-id": user?._id, },
+            });
+            const data = res.data;
+            toast.success("Help request submitted");
+            // reset form
+            setForm({
+                subject: "",
+                description: "",
+                supplierId: user?._id,
+                issueType: "CATEGORY",
+            });
+            onClose();
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong");
+        }
+    };
 
     return (
         <Modal open={open} onClose={onClose}>
             <Modal.Header title="Send Message" />
             <Modal.Body>
                 <div>
+                    <Input
+                        label="Subject"
+                        Icon={Captions}
+                        name="subject"
+                        value={form.subject}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
                     <label className="label">Message</label>
                     <div className="relative">
                         <MessageCircle size={18} className="icon" />
-                        <textarea cols={6} rows={6} className="input pl-8!" placeholder="Enter your Message" />
+                        <textarea
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange} cols={6} rows={6}
+                            className="input pl-8!"
+                            placeholder="Enter your Message"
+                        />
                     </div>
                 </div>
             </Modal.Body>

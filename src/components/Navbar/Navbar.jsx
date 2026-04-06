@@ -1,22 +1,25 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { LogIn, Menu, X, User, LogOut } from "lucide-react";
+import { LogIn, Menu, X, User, LogOut, Bell } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const [bellOpen, setBellOpen] = useState(false);
+  const bellRef = useRef(null);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await axios.post("/api/auth/logout");
     dispatch(logout());
     setProfileOpen(false)
     router.push("/");
@@ -26,6 +29,9 @@ export default function Navbar() {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileOpen(false);
+      }
+      if (bellRef.current && !bellRef.current.contains(event.target)) {
+        setBellOpen(false);
       }
     }
 
@@ -48,32 +54,48 @@ export default function Navbar() {
             className="object-contain h-16 w-50"
           />
         </Link>
-        {user ? (
-          <div className="relative" ref={profileRef}>
-            <button onClick={() => setProfileOpen(!profileOpen)}
-              className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-black" >
-              <User size={25} />
-            </button>
+        {user ? (<>
+          <div className="flex gap-2 items-center">
+            <div className="relative" ref={bellRef}>
+              <button onClick={() => setBellOpen(!bellOpen)}
+                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-black">
+                <Bell size={20} />
+              </button>
 
-            {profileOpen && (
-              <div className="absolute right-0 mt-1 w-70 bg-white shadow-lg rounded-lg border border-gray-300">
-                <div className="p-4 border-b border-b-gray-300">
-                  <p className="font-semibold text-black text-center">{user?.name}</p>
-                  <p className="text-sm text-gray-800 text-center">{user?.email}</p>
+              {bellOpen && (
+                <div className="absolute right-0 mt-1 w-70 bg-white shadow-lg rounded-lg border border-gray-300">
+                  <div className="p-4 border-b border-b-gray-300">
+                    <p className="font-semibold text-black text-center">No Notification yet.</p>
+                  </div>
                 </div>
-                <button onClick={() => { router.push(`/${user?.role}/dashboard`); setProfileOpen(false) }}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100 text-black">
-                  Dashboard
-                </button>
+              )}
+            </div>
+            <div className="relative" ref={profileRef}>
+              <button onClick={() => setProfileOpen(!profileOpen)}
+                className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-black" >
+                <User size={25} />
+              </button>
 
-                <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-500 hover:bg-red-100 flex items-center gap-2">
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
-            )}
+              {profileOpen && (
+                <div className="absolute right-0 mt-1 w-70 bg-white shadow-lg rounded-lg border border-gray-300">
+                  <div className="p-4 border-b border-b-gray-300">
+                    <p className="font-semibold text-black text-center">{user?.name}</p>
+                    <p className="text-sm text-gray-800 text-center">{user?.email}</p>
+                  </div>
+                  <button onClick={() => { router.push(`/${user?.role}/dashboard`); setProfileOpen(false) }}
+                    className="w-full px-4 py-2 text-left hover:bg-gray-100 text-black">
+                    Dashboard
+                  </button>
+
+                  <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-500 hover:bg-red-100 flex items-center gap-2">
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        ) : (
+        </>) : (
           <>
             <div className="hidden md:flex items-center gap-4">
               <Link href="/register/supplier" className="px-4 py-2.5 text-sm font-medium border text-white rounded-lg bg-[#D01132] hover:bg-[#c0102d]">

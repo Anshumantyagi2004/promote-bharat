@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/config/db";
 import Industry from "@/models/Industry";
 import Category from "@/models/Category";
+import { uploadToR2 } from "@/utils/uploadToR2";
 
 // ✅ Simple slug generator
 const slugify = (text) =>
@@ -17,8 +18,11 @@ const slugify = (text) =>
 export async function POST(req) {
   try {
     await connectDB();
-
-    const { name, metaTitle, metaDescription, imageUrl } = await req.json();
+    const formData = await req.formData();
+    const name = formData.get("name");
+    const metaTitle = formData.get("metaTitle");
+    const metaDescription = formData.get("metaDescription");
+    const file = formData.get("file");
 
     if (!name) {
       return NextResponse.json(
@@ -27,10 +31,8 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Generate slug
     const slug = slugify(name);
 
-    // ✅ Check duplicate
     const exists = await Industry.findOne({ slug });
     if (exists) {
       return NextResponse.json(
@@ -39,15 +41,34 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Create Industry
+    let imageUrl = "";
+    let imageKey = "";
+
+    if (file && file.size > 0) {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const fileName = `${Date.now()}-${file.name}`;
+
+      const resUpload = await uploadToR2({
+        file: buffer,
+        folder: "industries",
+        fileName,
+        contentType: file.type,
+      });
+
+      imageUrl = resUpload.url;
+      imageKey = resUpload.key;
+    }
+
     const industry = await Industry.create({
       name,
       slug,
       metaTitle: metaTitle || name,
       metaDescription: metaDescription || `Explore ${name}`,
-      imageUrl: imageUrl || "",
+      imageUrl,
+      imageKey,
     });
-
     return NextResponse.json(industry, { status: 201 });
   } catch (error) {
     return NextResponse.json(

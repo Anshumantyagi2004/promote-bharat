@@ -119,7 +119,24 @@ export default function Category() {
     metaTitle: "",
     metaDescription: "",
     imageUrl: "",
+    imageKey: "",
   });
+  const [imageFile, setImageFile] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Preview
+    const preview = URL.createObjectURL(file);
+
+    setIndustryForm((prev) => ({
+      ...prev,
+      imageUrl: preview,
+    }));
+
+    setImageFile(file);
+  };
 
   const handleChangeIndustry = (e) => {
     const { name, value } = e.target;
@@ -133,17 +150,24 @@ export default function Category() {
   const getIndustries = async () => {
     try {
       const res = await axios.get("/api/industry");
-
-      setIndustries(res.data); // store in state
+      setIndustries(res.data);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
   };
 
   const createIndustry = async (data) => {
-    try {
-      const res = await axios.post("/api/industry", data);
+    if (!data?.name) return toast.error("Name is mandatory");
 
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("metaTitle", data.metaTitle);
+      formData.append("metaDescription", data.metaDescription);
+      if (imageFile) {
+        formData.append("file", imageFile);
+      }
+      const res = await axios.post("/api/industry", formData);
       setIndustryForm({
         name: "",
         metaTitle: "",
@@ -159,7 +183,14 @@ export default function Category() {
 
   const updateIndustry = async (id, data) => {
     try {
-      const res = await axios.put(`/api/industry/${id}`, data);
+      const formData = new FormData();
+       formData.append("name", data.name);
+      formData.append("metaTitle", data.metaTitle);
+      formData.append("metaDescription", data.metaDescription);
+      if (imageFile) {
+        formData.append("file", imageFile);
+      }
+      const res = await axios.put(`/api/industry/${id}`, formData);
 
       setIndustryForm({
         name: "",
@@ -251,6 +282,7 @@ export default function Category() {
           setAddModalIndustry(false);
           setIndustryForm({});
         }}
+        handleImageChange={handleImageChange}
         form={industryForm}
         handleChange={handleChangeIndustry}
         handleSave={() =>

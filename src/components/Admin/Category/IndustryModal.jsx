@@ -3,8 +3,9 @@ import React from "react";
 import {
   FolderTree,
   SearchCode,
-  ChartBarDecreasing,
+  ChartBarDecreasing, Upload, ImagePlus
 } from "lucide-react";
+import Input from "@/components/Inputs/FormInput";
 
 export default function AddIndustryModal({
   open,
@@ -12,6 +13,7 @@ export default function AddIndustryModal({
   handleSave,
   handleChange,
   form,
+  handleImageChange
 }) {
   return (
     <Modal open={open} onClose={onClose}>
@@ -21,19 +23,41 @@ export default function AddIndustryModal({
 
       <Modal.Body>
         <div className="space-y-4">
+          <div className="flex flex-col items-center gap-4">
+            {/* Image Preview */}
+            <div className="relative group">
+              <img
+                src={form?.imageUrl || "/no-image.png"}
+                className="w-24 h-24 rounded-xl object-cover border border-gray-300 shadow-sm"
+                alt="preview"
+              />
 
-          {/* Image Preview */}
-          <div className="flex flex-col items-center gap-3">
-            <img
-              src={form?.imageUrl || "/no-image.png"}
-              className="w-20 h-20 rounded-full object-cover border"
-              alt=""
-            />
+              {/* Overlay */}
+              <label className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                <ImagePlus className="text-white w-6 h-6" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            {/* Upload Button */}
+            <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 transition">
+              <Upload className="w-4 h-4" />
+              <span className="text-sm font-medium">Upload Image</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
           </div>
 
-          {/* Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
             <Input
               label="Industry Name"
               name="name"
@@ -51,15 +75,6 @@ export default function AddIndustryModal({
               onChange={handleChange}
               placeholder="Enter Meta Title"
             />
-
-            {/* <Input
-              label="Image URL"
-              name="imageUrl"
-              value={form?.imageUrl}
-              icon={<FolderTree size={18} />}
-              onChange={handleChange}
-              placeholder="Enter Image URL"
-            /> */}
 
             <div className="md:col-span-2">
               <label className="label">Meta Description</label>
@@ -98,18 +113,5 @@ export default function AddIndustryModal({
         </div>
       </Modal.Footer>
     </Modal>
-  );
-}
-
-// ✅ Reusable Input
-function Input({ label, icon, ...props }) {
-  return (
-    <div>
-      <label className="label">{label}</label>
-      <div className="relative">
-        <div className="icon">{icon}</div>
-        <input className="input pl-8!" {...props} />
-      </div>
-    </div>
   );
 }

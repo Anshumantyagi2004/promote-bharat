@@ -31,8 +31,12 @@ const industrySchema = new mongoose.Schema(
             default: "",
         },
 
-        // ✅ Image (for UI / banner / card)
         imageUrl: {
+            type: String,
+            default: "",
+        },
+
+        imageKey: {
             type: String,
             default: "",
         },

@@ -30,8 +30,9 @@ export default function CategoryGrid({
             <div className="w-1/4 border-r border-gray-300 p-4 flex flex-col justify-between">
               <div className="flex flex-col items-center text-center gap-3">
                 <img
+                alt="loading"
                   src={item?.imageUrl}
-                  className="w-20 h-20 object-contain"
+                  className="w-40 h-25 object-contain"
                 />
               </div>
 
