@@ -40,6 +40,16 @@ const categorySchema = new mongoose.Schema(
       ref: "Category",
       default: null,
     },
+
+    imageUrl: {
+      type: String,
+      default: "",
+    },
+
+    imageKey: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

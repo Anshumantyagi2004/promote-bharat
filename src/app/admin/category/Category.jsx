@@ -36,6 +36,8 @@ export default function Category() {
     metaTitle: "",
     metaDescription: "",
     categoryDescription: "",
+    imageUrl: "",
+    imageKey: "",
   })
 
   const handleChange = (e) => {
@@ -48,11 +50,18 @@ export default function Category() {
 
   const handleSave = async () => {
     try {
-      const res = await axios.post("/api/category", {
-        ...form,
-        userId: user?._id,
-      });
+      const formData = new FormData();
+      formData.append("name", form?.name || "");
+      formData.append("metaTitle", form?.metaTitle || "");
+      formData.append("metaDescription", form?.metaDescription || "");
+      formData.append("categoryDescription", form?.categoryDescription || "");
+      formData.append("industryId", form?.industryId || "");
+      formData.append("parentCategoryId", form?.parentCategoryId || "");
+      if (imageFile) {
+        formData.append("file", imageFile);
+      }
 
+      const res = await axios.post("/api/category", formData);
       if (res.status === 201) {
         toast.success("Saved");
         setAddModal(false)
@@ -89,6 +98,7 @@ export default function Category() {
       await axios.delete(`/api/category/${id}`);
       toast.success("Deleted");
       getAllCategories(); // refresh
+      getIndustries(); // refresh
     } catch (err) {
       console.log(err);
     }
@@ -96,8 +106,18 @@ export default function Category() {
 
   const updateCategory = async (id, data) => {
     try {
-      const res = await axios.put(`/api/category/${id}`, data);
+      const formData = new FormData();
+      formData.append("name", data?.name || "");
+      formData.append("metaTitle", data?.metaTitle || "");
+      formData.append("metaDescription", data?.metaDescription || "");
+      formData.append("categoryDescription", data?.categoryDescription || "");
+      formData.append("industryId", data?.industryId || "");
+      formData.append("parentCategoryId", data?.parentCategoryId || "");
+      if (imageFile) {
+        formData.append("file", imageFile);
+      }
 
+      const res = await axios.put(`/api/category/${id}`, formData);
       if (res.status === 200) {
         toast.success("Updated");
         getAllCategories(); // refresh
@@ -131,6 +151,21 @@ export default function Category() {
     const preview = URL.createObjectURL(file);
 
     setIndustryForm((prev) => ({
+      ...prev,
+      imageUrl: preview,
+    }));
+
+    setImageFile(file);
+  };
+
+  const handleImageChangeCategory = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Preview
+    const preview = URL.createObjectURL(file);
+
+    setForm((prev) => ({
       ...prev,
       imageUrl: preview,
     }));
@@ -184,7 +219,7 @@ export default function Category() {
   const updateIndustry = async (id, data) => {
     try {
       const formData = new FormData();
-       formData.append("name", data.name);
+      formData.append("name", data.name);
       formData.append("metaTitle", data.metaTitle);
       formData.append("metaDescription", data.metaDescription);
       if (imageFile) {
@@ -264,6 +299,7 @@ export default function Category() {
 
       <AddModal
         open={addModal}
+        handleImageChange={handleImageChangeCategory}
         onClose={() => { setAddModal(false); setForm() }}
         handleChange={handleChange}
         form={form}

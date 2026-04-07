@@ -42,7 +42,7 @@ Modal.Header = function ModalHeader({ title }) {
   const { onClose } = useContext(ModalContext);
 
   return (
-    <div className="flex justify-between items-center px-6 py-4 border-b">
+    <div className="flex justify-between items-center px-6 py-4 border-b border-gray-300">
       <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
       <button onClick={onClose}>
         <X className="text-gray-400 hover:text-gray-600" />
@@ -57,7 +57,7 @@ Modal.Body = function ModalBody({ children }) {
 
 Modal.Footer = function ModalFooter({ children }) {
   return (
-    <div className="flex justify-end gap-2 px-6 py-4 border-t">
+    <div className="flex justify-end gap-2 px-6 py-4 border-t border-gray-300">
       {children}
     </div>
   );

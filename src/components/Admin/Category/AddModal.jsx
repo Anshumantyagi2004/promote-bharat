@@ -4,7 +4,12 @@ import {
   FolderTree,
   SearchCode,
   ChartBarDecreasing,
+  ImagePlus,
+  Upload,
+  Building,
 } from "lucide-react";
+import Input from "@/components/Inputs/FormInput";
+import SelectInput from "@/components/Inputs/SelectInput";
 
 export default function AddCategoryModal({
   open,
@@ -14,19 +19,47 @@ export default function AddCategoryModal({
   form,
   industries = [],
   categories = [],
+  handleImageChange
 }) {
   return (
     <Modal open={open} onClose={onClose}>
-      <Modal.Header
-        title={form?._id ? "Edit Category" : "Add Category"}
-      />
+      <Modal.Header title={form?._id ? "Edit Category" : "Add Category"} />
 
       <Modal.Body>
-        <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-center gap-3">
+            <div className="relative group">
+              <img
+                src={form?.imageUrl || "/no-image.png"}
+                className="w-20 h-20 rounded-lg object-cover border border-gray-300"
+                alt="preview"
+              />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Hover Overlay */}
+              <label className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                <ImagePlus className="text-white w-4 h-4" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+            </div>
 
-            {/* Category Name */}
+            <label className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 transition">
+              <Upload className="w-4 h-4" />
+              <span className="text-xs font-medium">Upload</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <Input
               label="Category Name"
               name="name"
@@ -36,43 +69,29 @@ export default function AddCategoryModal({
               placeholder="Enter Category Name"
             />
 
-            {/* Industry */}
-            <div>
-              <label className="label">Select Industry</label>
-              <select
-                name="industryId"
-                value={form?.industryId || ""}
-                onChange={handleChange}
-                className="input"
-              >
-                <option value="">Select Industry</option>
-                {industries.map((i) => (
-                  <option key={i._id} value={i._id}>
-                    {i.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SelectInput
+              label="Select Industry"
+              Icon={Building}
+              name="industryId"
+              value={form?.industryId}
+              onChange={handleChange}
+              options={industries.map((c) => ({
+                label: c?.name,
+                value: c?._id,
+              }))}
+            />
 
-            {/* Parent Category */}
-            <div>
-              <label className="label">Parent Category</label>
-              <select
-                name="parentCategoryId"
-                value={form?.parentCategoryId || ""}
-                onChange={handleChange}
-                className="input"
-              >
-                <option value="">None (Main Category)</option>
-                {categories.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SelectInput
+              label="Parent Category"
+              name="parentCategoryId"
+              value={form?.parentCategoryId}
+              onChange={handleChange}
+              options={categories.map((c) => ({
+                label: c?.name,
+                value: c?._id,
+              }))}
+            />
 
-            {/* Meta Title */}
             <Input
               label="Meta Title"
               name="metaTitle"
@@ -82,7 +101,6 @@ export default function AddCategoryModal({
               placeholder="Enter Meta Title"
             />
 
-            {/* Meta Description */}
             <div className="md:col-span-2">
               <label className="label">Meta Description</label>
               <div className="relative">
@@ -99,7 +117,6 @@ export default function AddCategoryModal({
               </div>
             </div>
 
-            {/* Category Description */}
             <div className="md:col-span-2">
               <label className="label">Category Description</label>
               <div className="relative">
@@ -115,7 +132,6 @@ export default function AddCategoryModal({
                 />
               </div>
             </div>
-
           </div>
         </div>
       </Modal.Body>
@@ -138,18 +154,5 @@ export default function AddCategoryModal({
         </div>
       </Modal.Footer>
     </Modal>
-  );
-}
-
-// ✅ Reusable Input
-function Input({ label, icon, ...props }) {
-  return (
-    <div>
-      <label className="label">{label}</label>
-      <div className="relative">
-        <div className="icon">{icon}</div>
-        <input className="input pl-8!" {...props} />
-      </div>
-    </div>
   );
 }

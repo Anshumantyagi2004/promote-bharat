@@ -3,7 +3,7 @@ import { r2 } from "@/config/r2";
 
 export const uploadToR2 = async ({ file, folder, fileName, contentType }) => {
   const key = `${folder}/${fileName}`;
-  console.log("BUCKET:", process.env.CLOUD_FLARE_R2_BUCKET);
+  // console.log("BUCKET:", process.env.CLOUD_FLARE_R2_BUCKET);
   const command = new PutObjectCommand({
     Bucket: process.env.CLOUD_FLARE_R2_BUCKET,
     Key: key,
