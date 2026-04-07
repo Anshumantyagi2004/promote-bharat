@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import NeedHelpModal from '@/components/Supplier/Product/NeedHelpModal';
+import ImageForm from '@/components/Supplier/Product/ImageForm';
 
 export default function Products() {
   const { user } = useSelector((state) => state.auth);
@@ -18,6 +19,8 @@ export default function Products() {
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [needHelp, setNeedHelp] = useState(false);
+  const [images, setImages] = useState([]);
+
   const tabs = [
     { id: "basic", label: "Basic Info" },
     { id: "category", label: "Category" },
@@ -51,6 +54,7 @@ export default function Products() {
     try {
       setLoading(true);
       const res = await axios.get(`/api/product?supplierId=${user._id}`);
+      // console.log(res)
       setProducts(res.data.data);
     } catch (err) {
       console.log("Failed to fetch products:", err);
@@ -66,40 +70,62 @@ export default function Products() {
   }, [user]);
 
   const handleSave = async () => {
-    try {
+    if (!form.name) return toast.error("Product name is required");
+    if (!form.categoryId) return toast.error("Category is required");
+
+    const saveProduct = async () => {
       setSaving(true);
-      if (!form.name) return toast.error("Product name is required");
-      if (!form.categoryId) return toast.error("Category is required");
+
+      const formData = new FormData();
+
+      // ✅ normal fields
+      Object.keys(form).forEach((key) => {
+        if (key === "specifications") {
+          formData.append(
+            "specifications",
+            JSON.stringify(form.specifications || [])
+          );
+        } else {
+          formData.append(key, form[key]);
+        }
+      });
+
+      // ✅ images
+      images.forEach((img) => {
+        formData.append("files", img.file);
+        formData.append("isPrimary", img.isPrimary);
+      });
 
       let res;
+
       if (editId) {
-        // 🔁 UPDATE
-        res = await axios.put(`/api/product/${editId}`, form);
+        res = await axios.put(`/api/product/${editId}`, formData);
       } else {
-        // ➕ CREATE
-        res = await axios.post("/api/product", form);
+        res = await axios.post("/api/product", formData);
       }
 
       if (!res?.data?.success) {
-        return toast.error(res?.data?.error || "Failed to save product");
+        throw new Error(res?.data?.error || "Failed to save product");
       }
-      toast.success(editId ? "Product updated" : "Product added");
+
+      return res.data;
+    };
+
+    try {
+      const data = await toast.promise(saveProduct(), {
+        loading: editId ? "Updating product..." : "Saving product...",
+        success: editId ? "Product updated!" : "Product added!",
+        error: "Could not save product",
+      });
+
+      // ✅ reset
       resetForm();
+      setImages([]);
       getProducts();
       setAddActive(false);
-    } catch (err) {
-      console.error("Error saving product:", err);
 
-      // 🔥 Better error messages
-      if (err.response) {
-        // Backend error
-        toast.error(err.response.data?.error || "Server error");
-      } else if (err.request) {
-        // No response
-        toast.error("No response from server");
-      } else {
-        toast.error("Something went wrong");
-      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setSaving(false);
     }
@@ -124,7 +150,7 @@ export default function Products() {
       metaDescription: item.metaDescription || "",
       specifications: item.specifications || [],
     });
-
+    setImages(item?.media)
     setEditId(item._id);
     setAddActive(true);
   };
@@ -207,36 +233,10 @@ export default function Products() {
 
     {isAddActive ? (
       <div className="grid lg:grid-cols-3 gap-5">
-        <div className="bg-white p-6 rounded-xl shadow space-y-4 h-fit relative">
-          <div className="flex flex-col items-center text-center">
-            <div className="flex flex-col items-center gap-3 relative">
-
-              {/* Preview */}
-              <div className="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                No Image
-              </div>
-
-              {/* Upload */}
-              <label className="absolute bottom-1 right-0 rounded-full p-2 bg-[#0a5183] hover:bg-[#074977] text-white cursor-pointer">
-                <Plus size={16} />
-                <input type="file" multiple className="hidden" />
-              </label>
-            </div>
-
-            <h2 className="text-lg font-semibold mt-3">
-              Product Images
-            </h2>
-            <p className="text-sm text-gray-500">
-              Upload product media
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-gray-100 h-16 rounded"></div>
-            <div className="bg-gray-100 h-16 rounded"></div>
-            <div className="bg-gray-100 h-16 rounded"></div>
-          </div>
-        </div>
+        <ImageForm
+          images={images}
+          setImages={setImages}
+        />
 
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white rounded-xl shadow p-2 flex flex-wrap gap-1.5">
@@ -289,6 +289,6 @@ export default function Products() {
       />
     )}
 
-    <NeedHelpModal open={needHelp} onClose={() => setNeedHelp(false)}user={user} />
+    <NeedHelpModal open={needHelp} onClose={() => setNeedHelp(false)} user={user} />
   </div>)
 }

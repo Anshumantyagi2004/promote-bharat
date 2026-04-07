@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/config/db";
 import Product from "@/models/Product";
+import ProductMedia from "@/models/ProductMedia";
 
 // ✅ slug function
 const slugify = (text) =>
@@ -87,12 +88,18 @@ export async function DELETE(req, { params }) {
 export async function GET(req, { params }) {
   try {
     await connectDB();
-    const { id } = await params;
+    const { id } = await params; // slug
+
     const product = await Product.findOne({ slug: id })
       .populate("categoryId", "name")
       .populate("subCategoryId", "name");
 
-    if (!product) {
+    const media = await ProductMedia.find({
+      productId: product._id,
+    });
+
+    const primaryImage = media.find((m) => m.isPrimary);
+    if (!product || product.length === 0) {
       return NextResponse.json({
         success: false,
         error: "Product not found",
@@ -101,7 +108,11 @@ export async function GET(req, { params }) {
 
     return NextResponse.json({
       success: true,
-      data: product,
+      data: {
+        ...product.toObject(),
+        media,
+        primaryImage,
+      },
     });
 
   } catch (err) {

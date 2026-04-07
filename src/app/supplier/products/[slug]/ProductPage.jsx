@@ -18,7 +18,6 @@ import React, { useEffect, useState } from "react";
 export default function ProductPage({ slug }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeImg, setActiveImg] = useState(0);
 
   const getProduct = async () => {
     try {
@@ -35,20 +34,28 @@ export default function ProductPage({ slug }) {
     getProduct();
   }, [slug]);
 
+  const images = product?.media?.length ? product.media : [{ url: "/no-image.png" }];
+  const [activeImg, setActiveImg] = useState(0);
+
+  useEffect(() => {
+    if (images.length) {
+      const index = images.findIndex((img) => img.isPrimary);
+      setActiveImg(index >= 0 ? index : 0);
+    }
+  }, [product]);
+
   if (loading) return <div className="p-6">Loading...</div>;
   if (!product) return <div className="p-6">Product not found</div>;
-
-  const images = product?.images || ["/no-image.png", "/no-image.png", "/no-image.png"];
 
   return (
     <div className="p-6 w-full bg-gray-100 space-y-6">
       <div className="bg-white rounded-2xl shadow-md p-6 grid md:grid-cols-2 gap-8">
         <div>
-          <div className="bg-gray-50 h-96 rounded-xl flex items-center justify-center mb-4 border border-gray-200">
+          <div className="bg-gray-50 h-96 rounded-xl flex items-center justify-center mb-4 border border-gray-200 overflow-hidden">
             <img
-              src={images[activeImg]}
-              className="h-full object-contain"
-              alt=""
+              src={images[activeImg]?.url || "/no-image.png"}
+              className="h-full object-contain transition duration-300"
+              alt="product"
             />
           </div>
 
@@ -56,7 +63,7 @@ export default function ProductPage({ slug }) {
             {images.map((img, i) => (
               <img
                 key={i}
-                src={img}
+                src={img?.url || "/no-image.png"}
                 onClick={() => setActiveImg(i)}
                 className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 transition ${activeImg === i
                   ? "border-[#0a5183] scale-105"

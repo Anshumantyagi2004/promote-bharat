@@ -4,7 +4,7 @@ import React from "react";
 
 export default function ProductGrid({ products = [], loading, handleEdit, handleDelete }) {
     return (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 bg-white p-4 rounded-lg shadow">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 bg-white p-4 rounded-lg shadow">
             {loading &&
                 Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="bg-white p-2 rounded-xl shadow animate-pulse border border-gray-300">
@@ -17,8 +17,16 @@ export default function ProductGrid({ products = [], loading, handleEdit, handle
             {!loading &&
                 products.map((item) => (
                     <div key={item?._id} className="bg-white p-2 rounded-xl shadow hover:shadow-md transition border border-gray-200">
-                        <div className="h-40 bg-gray-100 rounded mb-2 flex items-center justify-center text-gray-400">
-                            Image
+                        <div className="h-40 w-full mb-2 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                            <img
+                                src={
+                                    item?.primaryImage?.url ||
+                                    item?.media?.[0]?.url ||
+                                    "/no-image.png"
+                                }
+                                alt={item?.name || "product"}
+                                className="h-full w-full object-contain transition-transform duration-300 hover:scale-105"
+                            />
                         </div>
 
                         <Link href={`/supplier/products/${item?.slug}`} className="font-bold text-black text-lg px-1.5">
