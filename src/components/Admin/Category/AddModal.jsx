@@ -30,7 +30,7 @@ export default function AddCategoryModal({
           <div className="flex items-center justify-center gap-3">
             <div className="relative group">
               <img
-                src={form?.imageUrl || "/no-image.png"}
+                src={form?.imageUrl}
                 className="w-20 h-20 rounded-lg object-cover border border-gray-300"
                 alt="preview"
               />

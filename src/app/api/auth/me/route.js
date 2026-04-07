@@ -6,6 +6,7 @@ import User from "@/models/User";
 export async function GET() {
   try {
     await connectDB();
+    console.log("Hello from Server")
     const cookieStore = await cookies();   // important
     const token = cookieStore.get("promote_bharat_token")?.value;
 

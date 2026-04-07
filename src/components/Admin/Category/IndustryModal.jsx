@@ -27,7 +27,7 @@ export default function AddIndustryModal({
             {/* Image Preview */}
             <div className="relative group">
               <img
-                src={form?.imageUrl || "/no-image.png"}
+                src={form?.imageUrl}
                 className="w-24 h-24 rounded-xl object-cover border border-gray-300 shadow-sm"
                 alt="preview"
               />

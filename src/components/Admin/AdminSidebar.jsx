@@ -9,7 +9,8 @@ import {
   Package,
   Settings,
   Menu,
-  X
+  X,
+  CircleQuestionMark
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -20,6 +21,7 @@ export default function AdminSidebar() {
     { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
     { name: "Profile", icon: User, path: "/admin/profile" },
     { name: "Category", icon: Package, path: "/admin/category" },
+    { name: "Help", icon: CircleQuestionMark, path: "/admin/help" },
     { name: "Settings", icon: Settings, path: "/admin/settings" },
   ];
 
