@@ -16,12 +16,14 @@ import {
 import React, { useEffect, useState } from "react";
 
 export default function ProductPage({ slug }) {
+  // console.log(slug)
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const getProduct = async () => {
     try {
       const res = await axios.get(`/api/product/${slug}`);
+      // console.log(res)
       setProduct(res.data.data);
     } catch (err) {
       console.log(err);

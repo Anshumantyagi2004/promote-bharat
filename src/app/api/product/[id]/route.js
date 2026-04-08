@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/config/db";
 import Product from "@/models/Product";
 import ProductMedia from "@/models/ProductMedia";
+import Category from "@/models/Category";
 
 // ✅ slug function
 const slugify = (text) =>
@@ -89,7 +90,7 @@ export async function GET(req, { params }) {
   try {
     await connectDB();
     const { id } = await params; // slug
-
+    // console.log(id)
     const product = await Product.findOne({ slug: id })
       .populate("categoryId", "name")
       .populate("subCategoryId", "name");
