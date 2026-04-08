@@ -3,6 +3,8 @@ import { connectDB } from "@/config/db";
 import Product from "@/models/Product";
 import ProductMedia from "@/models/ProductMedia";
 import Category from "@/models/Category";
+import { uploadToR2 } from "@/utils/uploadToR2";
+import { deleteFromR2 } from "@/utils/deleteFromR2";
 
 // ✅ slug function
 const slugify = (text) =>
@@ -19,7 +21,27 @@ export async function PUT(req, { params }) {
   try {
     await connectDB();
     const { id } = await params;
-    const body = await req.json();
+    const formData = await req.formData();
+    const body = {};
+
+    for (let [key, value] of formData.entries()) {
+      if (
+        key !== "files" &&
+        key !== "specifications" &&
+        key !== "imagesState"
+      ) {
+        body[key] = value;
+      }
+    }
+
+    const rawSpecs = formData.get("specifications");
+    if (rawSpecs) {
+      try {
+        body.specifications = JSON.parse(rawSpecs);
+      } catch {
+        body.specifications = [];
+      }
+    }
 
     const existingProduct = await Product.findById(id);
     if (!existingProduct) {
@@ -29,17 +51,14 @@ export async function PUT(req, { params }) {
       });
     }
 
-    // 🔥 IF NAME CHANGED → UPDATE SLUG
     if (body.name && body.name !== existingProduct.name) {
       let slug = slugify(body.name);
-
       let existing = await Product.findOne({
         slug,
-        _id: { $ne: id }, // exclude current product
+        _id: { $ne: id },
       });
 
       let count = 1;
-
       while (existing) {
         slug = `${slugify(body.name)}-${count}`;
         existing = await Product.findOne({
@@ -48,22 +67,71 @@ export async function PUT(req, { params }) {
         });
         count++;
       }
-
       body.slug = slug;
     }
 
-    // 🔥 UPDATE
-    const updated = await Product.findByIdAndUpdate(
-      id,
-      body,
-      { new: true }
-    );
+    const updatedProduct = await Product.findByIdAndUpdate(id, body, {
+      new: true,
+    });
+
+    const imagesStateRaw = formData.get("imagesState");
+    const imagesState = imagesStateRaw
+      ? JSON.parse(imagesStateRaw)
+      : [];
+
+    const existingMedia = await ProductMedia.find({ productId: id });
+
+    for (let media of existingMedia) {
+      const stillExists = imagesState.find(
+        (img) => img.url && img.url === media.url
+      );
+
+      if (!stillExists) {
+        const key = media.url.split(".r2.dev/")[1];
+        if (key) {
+          await deleteFromR2(key);
+        }
+        await ProductMedia.findByIdAndDelete(media._id);
+      }
+    }
+
+    const files = formData.getAll("files");
+    let fileIndex = 0;
+    for (let img of imagesState) {
+      if (!img.isOld) {
+        const file = files[fileIndex++];
+        if (!file) continue;
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const fileName = `${Date.now()}-${file.name}`;
+        const uploadRes = await uploadToR2({
+          file: buffer,
+          folder: `products/${id}`,
+          fileName,
+          contentType: file.type,
+        });
+
+        await ProductMedia.create({
+          productId: id,
+          type: "image",
+          url: uploadRes.url,
+          isPrimary: img.isPrimary,
+        });
+      }
+    }
+
+    for (let img of imagesState) {
+      if (img.isOld && img.url) {
+        await ProductMedia.updateOne(
+          { productId: id, url: img.url },
+          { $set: { isPrimary: img.isPrimary } }
+        );
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      data: updated,
+      data: updatedProduct,
     });
-
   } catch (err) {
     return NextResponse.json({
       success: false,
@@ -115,7 +183,6 @@ export async function GET(req, { params }) {
         primaryImage,
       },
     });
-
   } catch (err) {
     return NextResponse.json({
       success: false,

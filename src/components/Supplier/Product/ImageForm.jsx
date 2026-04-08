@@ -1,14 +1,15 @@
 import { Plus, Star, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
-export default function ImageForm({ productId,setImages ,images}) {
+export default function ImageForm({ productId, setImages, images }) {
     const handleFiles = (e) => {
         const files = Array.from(e.target.files);
 
         const previewFiles = files.map((file) => ({
             file,
             preview: URL.createObjectURL(file),
-            isPrimary: images.length == 0 ? true : false,
+            isPrimary: images.length === 0,
+            isOld: false, // 🔥 NEW IMAGE
         }));
 
         setImages((prev) => [...prev, ...previewFiles]);
@@ -28,45 +29,19 @@ export default function ImageForm({ productId,setImages ,images}) {
         setImages(updated);
     };
 
-    const uploadImages = async () => {
-        if (!productId) return alert("Product ID missing");
-
-        for (let img of images) {
-            const formData = new FormData();
-            formData.append("file", img.file);
-            formData.append("folder", "products");
-
-            const uploadRes = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            const uploadData = await uploadRes.json();
-
-            // save in DB
-            await fetch("/api/product-media", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    productId,
-                    type: "image",
-                    url: uploadData.url,
-                    isPrimary: img.isPrimary,
-                }),
-            });
-        }
-        alert("Images uploaded");
-        setImages([]);
-    };
-
+    // console.log(images)
     return (
         <div className="bg-white p-6 rounded-xl shadow-md space-y-4 h-fit">
             <div className="w-full h-52 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
                 {images[0] ? (
                     <img
-                        src={images.find(i => i.isPrimary)?.preview || images[0].preview|| images[0]?.url}
+                        src={
+                            images.find((i) => i.isPrimary)?.preview ||
+                            images.find((i) => i.isPrimary)?.url ||
+                            images[0]?.preview ||
+                            images[0]?.url ||
+                            "/no-image.png"
+                        }
                         className="h-full w-full object-contain"
                     />
                 ) : (
@@ -83,7 +58,7 @@ export default function ImageForm({ productId,setImages ,images}) {
                     <div key={index}
                         className={`relative group rounded-lg overflow-hidden border ${img.isPrimary ? "border-blue-500" : "border-gray-200"}`}>
                         <img
-                            src={img.preview || img?.url}
+                            src={img.preview || img.url}
                             className="h-24 w-full object-cover"
                         />
 
@@ -110,13 +85,6 @@ export default function ImageForm({ productId,setImages ,images}) {
                     </div>
                 ))}
             </div>
-
-            {/* <button
-                onClick={uploadImages}
-                className="w-full bg-green-600 hover:bg-green-700 transition text-white py-2.5 rounded-lg"
-            >
-                Save Images
-            </button> */}
         </div>
     );
 }

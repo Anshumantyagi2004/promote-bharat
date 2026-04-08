@@ -70,15 +70,23 @@ export default function Products() {
   }, [user]);
 
   const handleSave = async () => {
+    if (saving) return
     if (!form.name) return toast.error("Product name is required");
-    if (!form.categoryId) return toast.error("Category is required");
-
+    setSaving(true)
     const saveProduct = async () => {
-      setSaving(true);
-
       const formData = new FormData();
+      let updatedImages = [...images];
 
-      // ✅ normal fields
+      if (!updatedImages.some((img) => img.isPrimary) && updatedImages.length) {
+        updatedImages[0].isPrimary = true;
+      }
+
+      const formattedImages = updatedImages.map((img) => ({
+        url: img.url || null,
+        isPrimary: img.isPrimary,
+        isOld: img.isOld,
+      }));
+
       Object.keys(form).forEach((key) => {
         if (key === "specifications") {
           formData.append(
@@ -90,14 +98,15 @@ export default function Products() {
         }
       });
 
-      // ✅ images
-      images.forEach((img) => {
-        formData.append("files", img.file);
-        formData.append("isPrimary", img.isPrimary);
+      updatedImages.forEach((img) => {
+        if (!img.isOld && img.file) {
+          formData.append("files", img.file);
+        }
       });
 
-      let res;
+      formData.append("imagesState", JSON.stringify(formattedImages));
 
+      let res;
       if (editId) {
         res = await axios.put(`/api/product/${editId}`, formData);
       } else {
@@ -107,27 +116,21 @@ export default function Products() {
       if (!res?.data?.success) {
         throw new Error(res?.data?.error || "Failed to save product");
       }
-
       return res.data;
     };
 
     try {
-      const data = await toast.promise(saveProduct(), {
+      await toast.promise(saveProduct(), {
         loading: editId ? "Updating product..." : "Saving product...",
         success: editId ? "Product updated!" : "Product added!",
         error: "Could not save product",
       });
-
-      // ✅ reset
       resetForm();
       setImages([]);
-      getProducts();
       setAddActive(false);
-
-    } catch (err) {
-      console.error(err);
+      getProducts();
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
   };
 
@@ -150,7 +153,13 @@ export default function Products() {
       metaDescription: item.metaDescription || "",
       specifications: item.specifications || [],
     });
-    setImages(item?.media)
+
+    const formattedImages = item?.media.map((img) => ({
+      url: img.url || null,
+      isPrimary: img.isPrimary,
+      isOld: img.isOld,
+    }));
+    setImages(formattedImages);
     setEditId(item._id);
     setAddActive(true);
   };
@@ -189,6 +198,7 @@ export default function Products() {
       specifications: [],
     });
     setActiveTab("basic")
+    setImages([])
     setEditId(null);
   };
 
