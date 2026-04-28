@@ -5,6 +5,7 @@ import { uploadToR2 } from "@/utils/uploadToR2";
 import { NextResponse } from "next/server";
 import Product from "@/models/Product";
 import ProductMedia from "@/models/ProductMedia";
+import User from "@/models/User";
 
 // ✅ slug function
 const slugify = (text) =>
@@ -134,7 +135,7 @@ export async function GET(req, { params }) {
         { subCategoryId: id }
       ]
     })
-      .populate("supplierId", "name email") // optional
+      .populate("supplierId") // optional
       .sort({ createdAt: -1 })
       .lean();
 
