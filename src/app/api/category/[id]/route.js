@@ -115,7 +115,7 @@ export async function GET(req, { params }) {
   try {
     await connectDB();
 
-    const { id } = params;
+    const { id } = await params;
 
     // 1. Find category
     const category = await Category.findById(id);
