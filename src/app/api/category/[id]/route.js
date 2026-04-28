@@ -118,8 +118,8 @@ export async function GET(req, { params }) {
 
     const { id } = await params;
 
-    // 1. Find category
-    const category = await Category.findById(id);
+    // 1. Get main category
+    const category = await Category.findById(id).lean();
 
     if (!category) {
       return NextResponse.json(
@@ -128,38 +128,48 @@ export async function GET(req, { params }) {
       );
     }
 
-    // 2. Find products in this category
+    // 2. Get subcategories
+    const subcategories = await Category.find({
+      parentCategoryId: id,
+    }).lean();
+
+    const subCategoryIds = subcategories.map((sub) => sub._id);
+
+    // 3. Get all products of subcategories
     const products = await Product.find({
-      $or: [
-        { categoryId: id },
-        { subCategoryId: id }
-      ]
+      subCategoryId: { $in: subCategoryIds },
     })
-      .populate("supplierId") // optional
+      .populate("supplierId")
       .sort({ createdAt: -1 })
       .lean();
 
-    // 3. Attach media to each product
+    // 4. Get all media
     const productIds = products.map((p) => p._id);
 
     const media = await ProductMedia.find({
       productId: { $in: productIds },
     }).lean();
 
-    // Map media to products
-    const productsWithMedia = products.map((product) => {
-      return {
-        ...product,
-        media: media.filter(
-          (m) => m.productId.toString() === product._id.toString()
-        ),
-      };
-    });
+    // 5. Attach media to products
+    const productsWithMedia = products.map((product) => ({
+      ...product,
+      media: media.filter(
+        (m) => m.productId.toString() === product._id.toString()
+      ),
+    }));
+
+    // 6. Attach products to subcategories
+    const subcategoriesWithProducts = subcategories.map((sub) => ({
+      ...sub,
+      products: productsWithMedia.filter(
+        (p) => p.subCategoryId?.toString() === sub._id.toString()
+      ),
+    }));
 
     return NextResponse.json({
       data: {
         category,
-        products: productsWithMedia,
+        subcategories: subcategoriesWithProducts,
       },
     });
 
