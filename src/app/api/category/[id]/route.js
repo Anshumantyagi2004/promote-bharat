@@ -112,13 +112,82 @@ export async function DELETE(_, { params }) {
   }
 }
 
+// export async function GET(req, { params }) {
+//   try {
+//     await connectDB();
+
+//     const { id } = await params;
+
+//     // 1. Get main category
+//     const category = await Category.findById(id).lean();
+
+//     if (!category) {
+//       return NextResponse.json(
+//         { message: "Category not found" },
+//         { status: 404 }
+//       );
+//     }
+
+//     // 2. Get subcategories
+//     const subcategories = await Category.find({
+//       parentCategoryId: id,
+//     }).lean();
+
+//     const subCategoryIds = subcategories.map((sub) => sub._id);
+
+//     // 3. Get all products of subcategories
+//     const products = await Product.find({
+//       subCategoryId: { $in: subCategoryIds },
+//     })
+//       .populate("supplierId")
+//       .sort({ createdAt: -1 })
+//       .lean();
+
+//     // 4. Get all media
+//     const productIds = products.map((p) => p._id);
+
+//     const media = await ProductMedia.find({
+//       productId: { $in: productIds },
+//     }).lean();
+
+//     // 5. Attach media to products
+//     const productsWithMedia = products.map((product) => ({
+//       ...product,
+//       media: media.filter(
+//         (m) => m.productId.toString() === product._id.toString()
+//       ),
+//     }));
+
+//     // 6. Attach products to subcategories
+//     const subcategoriesWithProducts = subcategories.map((sub) => ({
+//       ...sub,
+//       products: productsWithMedia.filter(
+//         (p) => p.subCategoryId?.toString() === sub._id.toString()
+//       ),
+//     }));
+
+//     return NextResponse.json({
+//       data: {
+//         category,
+//         subcategories: subcategoriesWithProducts,
+//       },
+//     });
+
+//   } catch (error) {
+//     return NextResponse.json(
+//       { message: "Error", error: error.message },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 export async function GET(req, { params }) {
   try {
     await connectDB();
 
     const { id } = await params;
 
-    // 1. Get main category
+    // 1. Find category
     const category = await Category.findById(id).lean();
 
     if (!category) {
@@ -128,50 +197,83 @@ export async function GET(req, { params }) {
       );
     }
 
-    // 2. Get subcategories
-    const subcategories = await Category.find({
-      parentCategoryId: id,
-    }).lean();
+    // 👉 CASE 1: MAIN CATEGORY (no parent)
+    if (!category.parentCategoryId) {
+      // Get subcategories
+      const subcategories = await Category.find({
+        parentCategoryId: id,
+      }).lean();
 
-    const subCategoryIds = subcategories.map((sub) => sub._id);
+      const subIds = subcategories.map((sub) => sub._id);
 
-    // 3. Get all products of subcategories
-    const products = await Product.find({
-      subCategoryId: { $in: subCategoryIds },
-    })
-      .populate("supplierId")
-      .sort({ createdAt: -1 })
-      .lean();
+      // Get products of all subcategories
+      const products = await Product.find({
+        subCategoryId: { $in: subIds },
+      })
+        .populate("supplierId")
+        .sort({ createdAt: -1 })
+        .lean();
 
-    // 4. Get all media
-    const productIds = products.map((p) => p._id);
+      // Get media
+      const productIds = products.map((p) => p._id);
 
-    const media = await ProductMedia.find({
-      productId: { $in: productIds },
-    }).lean();
+      const media = await ProductMedia.find({
+        productId: { $in: productIds },
+      }).lean();
 
-    // 5. Attach media to products
-    const productsWithMedia = products.map((product) => ({
-      ...product,
-      media: media.filter(
-        (m) => m.productId.toString() === product._id.toString()
-      ),
-    }));
+      // Attach media
+      const productsWithMedia = products.map((product) => ({
+        ...product,
+        media: media.filter(
+          (m) => m.productId.toString() === product._id.toString()
+        ),
+      }));
 
-    // 6. Attach products to subcategories
-    const subcategoriesWithProducts = subcategories.map((sub) => ({
-      ...sub,
-      products: productsWithMedia.filter(
-        (p) => p.subCategoryId?.toString() === sub._id.toString()
-      ),
-    }));
+      // Attach products to each subcategory
+      const subcategoriesWithProducts = subcategories.map((sub) => ({
+        ...sub,
+        products: productsWithMedia.filter(
+          (p) => p.subCategoryId?.toString() === sub._id.toString()
+        ),
+      }));
 
-    return NextResponse.json({
-      data: {
-        category,
-        subcategories: subcategoriesWithProducts,
-      },
-    });
+      return NextResponse.json({
+        data: {
+          category,
+          subcategories: subcategoriesWithProducts,
+        },
+      });
+    }
+
+    // 👉 CASE 2: SUBCATEGORY
+    else {
+      const products = await Product.find({
+        subCategoryId: id,
+      })
+        .populate("supplierId")
+        .sort({ createdAt: -1 })
+        .lean();
+
+      const productIds = products.map((p) => p._id);
+
+      const media = await ProductMedia.find({
+        productId: { $in: productIds },
+      }).lean();
+
+      const productsWithMedia = products.map((product) => ({
+        ...product,
+        media: media.filter(
+          (m) => m.productId.toString() === product._id.toString()
+        ),
+      }));
+
+      return NextResponse.json({
+        data: {
+          category,
+          products: productsWithMedia,
+        },
+      });
+    }
 
   } catch (error) {
     return NextResponse.json(
