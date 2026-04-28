@@ -3,6 +3,8 @@ import Category from "@/models/Category";
 import { deleteFromR2 } from "@/utils/deleteFromR2";
 import { uploadToR2 } from "@/utils/uploadToR2";
 import { NextResponse } from "next/server";
+import Product from "@/models/Product";
+import ProductMedia from "@/models/ProductMedia";
 
 // ✅ slug function
 const slugify = (text) =>
@@ -102,6 +104,65 @@ export async function DELETE(_, { params }) {
     return NextResponse.json({ message: "Deleted successfully" });
   } catch (error) {
     console.error(error);
+    return NextResponse.json(
+      { message: "Error", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(req, { params }) {
+  try {
+    await connectDB();
+
+    const { id } = params;
+
+    // 1. Find category
+    const category = await Category.findById(id);
+
+    if (!category) {
+      return NextResponse.json(
+        { message: "Category not found" },
+        { status: 404 }
+      );
+    }
+
+    // 2. Find products in this category
+    const products = await Product.find({
+      $or: [
+        { categoryId: id },
+        { subCategoryId: id }
+      ]
+    })
+      .populate("supplierId", "name email") // optional
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // 3. Attach media to each product
+    const productIds = products.map((p) => p._id);
+
+    const media = await ProductMedia.find({
+      productId: { $in: productIds },
+    }).lean();
+
+    // Map media to products
+    const productsWithMedia = products.map((product) => {
+      return {
+        ...product,
+        media: media.filter(
+          (m) => m.productId.toString() === product._id.toString()
+        ),
+      };
+    });
+
+    return NextResponse.json({
+      data: {
+        category,
+        products: productsWithMedia,
+      },
+    });
+
+  } catch (error) {
     return NextResponse.json(
       { message: "Error", error: error.message },
       { status: 500 }
