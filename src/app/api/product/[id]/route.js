@@ -160,8 +160,8 @@ export async function GET(req, { params }) {
     const { id } = await params; // slug
     // console.log(id)
     const product = await Product.findOne({ slug: id })
-      .populate("categoryId", "name", "slug")
-      .populate("subCategoryId", "name", "slug")
+      .populate("categoryId", "name slug")
+      .populate("subCategoryId", "name slug")
       .populate("supplierId", "-password");
 
     const business = await Business.findOne({
