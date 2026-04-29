@@ -5,6 +5,8 @@ import ProductMedia from "@/models/ProductMedia";
 import Category from "@/models/Category";
 import { uploadToR2 } from "@/utils/uploadToR2";
 import { deleteFromR2 } from "@/utils/deleteFromR2";
+import Business from "@/models/UserBusiness";
+import User from "@/models/User";
 
 // ✅ slug function
 const slugify = (text) =>
