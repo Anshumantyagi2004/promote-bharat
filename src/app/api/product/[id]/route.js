@@ -160,8 +160,13 @@ export async function GET(req, { params }) {
     const { id } = await params; // slug
     // console.log(id)
     const product = await Product.findOne({ slug: id })
-      .populate("categoryId", "name")
-      .populate("subCategoryId", "name");
+      .populate("categoryId", "name", "slug")
+      .populate("subCategoryId", "name", "slug")
+      .populate("supplierId", "-password");
+
+    const business = await Business.findOne({
+      userId: product.supplierId._id,
+    });
 
     const media = await ProductMedia.find({
       productId: product._id,
@@ -181,6 +186,10 @@ export async function GET(req, { params }) {
         ...product.toObject(),
         media,
         primaryImage,
+        supplierId: {
+          ...product.supplierId.toObject(),
+          business,
+        },
       },
     });
   } catch (err) {
