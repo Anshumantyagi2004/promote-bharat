@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   CircleQuestionMark,
+  LayoutPanelTop,
 } from "lucide-react";
 
 export default function SupplierSidebar() {
@@ -21,6 +22,7 @@ export default function SupplierSidebar() {
     { name: "Dashboard", icon: LayoutDashboard, path: "/supplier/dashboard" },
     { name: "Profile", icon: User, path: "/supplier/profile" },
     { name: "Products", icon: Package, path: "/supplier/products" },
+    { name: "Website Page", icon: LayoutPanelTop, path: "/supplier/website-page" },
     { name: "Help", icon: CircleQuestionMark, path: "/supplier/help" },
     { name: "Settings", icon: Settings, path: "/supplier/settings" },
   ];
