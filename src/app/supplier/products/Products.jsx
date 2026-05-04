@@ -277,10 +277,10 @@ export default function Products() {
                 )}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => { setAddActive(false); resetForm() }} className="px-5 py-2 rounded-lg bg-[#D01132] text-white">
+                <button onClick={() => { setAddActive(false); resetForm() }} className="cursor-pointer px-5 py-2 rounded-lg bg-[#D01132] text-white">
                   Cancel
                 </button>
-                <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-[#0a5183] text-white rounded-lg">
+                <button onClick={handleSave} disabled={saving} className="cursor-pointer px-6 py-2 bg-[#0a5183] text-white rounded-lg">
                   {editId ?
                     saving ? "Updating..." : "Update"
                     : saving ? "Saving..." : "Save"}
