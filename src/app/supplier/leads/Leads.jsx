@@ -8,7 +8,7 @@ export default function Leads() {
     const [open, setOpen] = useState(false);
     return (
         <div className='p-4 bg-gray-100 w-full'>
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 bg-white px-4 py-3 rounded-xl shadow-sm">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4 bg-white px-4 py-3 rounded-xl shadow-sm">
                 <div className='flex items-center gap-2'>
                     <h1 className="text-2xl font-bold text-gray-800">
                         Leads

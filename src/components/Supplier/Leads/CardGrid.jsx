@@ -101,7 +101,7 @@ export default function LeadList() {
             </div>
 
             {/* Message */}
-            <div className="mt-2 p-3 rounded-lg bg-gray-50 border">
+            <div className="mt-2 p-2 rounded-lg bg-gray-50 border border-gray-300">
               <p className="flex items-center gap-2 text-sm font-medium text-gray-800 mb-1">
                 <MessageSquare size={16} className="text-[#074977]" />
                 Message
