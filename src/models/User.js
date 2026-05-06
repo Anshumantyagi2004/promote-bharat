@@ -20,9 +20,12 @@ const userSchema = new mongoose.Schema(
 
     password: String,
 
+    profileImage: String,
+    profileImageKey: String,
+
     role: {
       type: String,
-      enum: ["buyer", "supplier","admin"],
+      enum: ["buyer", "supplier", "admin"],
       default: "buyer",
     },
   },

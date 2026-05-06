@@ -5,10 +5,8 @@ import {
   Landmark,
   Star,
   Share2,
-  User,
   Phone,
   Mail,
-  MapPin,
   ChartLine,
   Link,
   File,
@@ -19,7 +17,6 @@ import {
   Facebook,
   Youtube,
   Twitter,
-  ImageIcon,
   Camera,
 } from "lucide-react";
 import BusinessForm from "@/components/Supplier/Profile/BusinessForm";
@@ -100,6 +97,38 @@ export default function Profile() {
     return name ? name.charAt(0).toUpperCase() : "U";
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const uploadImage = async () => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await axios.post("/api/upload", formData, {
+        headers: { "x-user-id": user?._id, },
+      });
+
+      if (!res?.data?.success) {
+        throw new Error(res?.data?.error || "Upload failed");
+      }
+
+      const { url } = res.data;
+      dispatch(setUser({
+        ...user,
+        profileImage: url,
+      }));
+
+      return true;
+    };
+
+    await toast.promise(uploadImage(), {
+      loading: "Uploading profile image...",
+      success: "Profile image updated!",
+      error: (err) => err.message || "Upload failed",
+    });
+  };
+
   return (
     <div className="p-4 md:p-6 w-full bg-gray-100">
       <div className="grid lg:grid-cols-3 gap-5">
@@ -121,9 +150,9 @@ export default function Profile() {
                   {getInitial(user?.name)}
                 </div>
               )}
-              <label className="absolute bottom-1 right-0 z-50 rounded-full p-1.5 bg-[#0a5183] hover:bg-[#0a4169] text-white cursor-pointer">
+              <label className="absolute bottom-1 right-0 z-40 rounded-full p-1.5 bg-[#0a5183] hover:bg-[#0a4169] text-white cursor-pointer">
                 <Camera size={16} />
-                <input type="file" className="hidden" />
+                <input type="file" className="hidden" onChange={handleImageChange} />
               </label>
             </div>
 
