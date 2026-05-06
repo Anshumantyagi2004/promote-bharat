@@ -6,7 +6,7 @@ export default function ProductGrid({ products = [], loading, handleEdit, handle
     return (
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 bg-white p-4 rounded-lg shadow">
             {loading &&
-                Array.from({ length: 6 }).map((_, i) => (
+                Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="bg-white p-2 rounded-xl shadow animate-pulse border border-gray-300">
                         <div className="h-40 bg-gray-200 rounded mb-3"></div>
                         <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
