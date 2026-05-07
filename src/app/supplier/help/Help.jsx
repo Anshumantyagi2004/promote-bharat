@@ -42,7 +42,7 @@ export default function Help() {
   };
 
   return (
-    <div className="flex flex-col w-full px-6 py-4 gap-8">
+    <div className="flex flex-col w-full p-4 gap-8 bg-gray-100">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
         {helpItems.map((item, index) => {
           const Icon = item.icon;
