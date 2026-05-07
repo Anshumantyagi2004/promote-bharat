@@ -3,9 +3,12 @@ import LeadList from '@/components/Supplier/Leads/CardGrid';
 import FilterSidebar from '@/components/Supplier/Leads/FilterSidebar';
 import { Filter, Search, X } from 'lucide-react'
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 
 export default function Leads() {
     const [open, setOpen] = useState(false);
+    const { user } = useSelector((state) => state.auth);
+
     return (
         <div className='p-4 bg-gray-100 w-full'>
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4 bg-white px-4 py-3 rounded-xl shadow-sm">
@@ -43,7 +46,7 @@ export default function Leads() {
                 </div>
             </div>
 
-            <LeadList />
+            <LeadList user={user} />
 
             <FilterSidebar open={open} setOpen={setOpen} />
         </div>

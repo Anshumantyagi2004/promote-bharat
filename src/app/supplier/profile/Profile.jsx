@@ -142,7 +142,7 @@ export default function Profile() {
               {user?.profileImage ? (
                 <img
                   src={user?.profileImage}
-                  className="w-20 h-20 rounded-full object-cover border"
+                  className="w-20 h-20 rounded-full object-contain border border-gray-300"
                   alt=""
                 />
               ) : (
