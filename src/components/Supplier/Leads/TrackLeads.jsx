@@ -12,6 +12,8 @@ import {
     Globe,
     Activity,
     Loader2,
+    Sparkles,
+    Package
 } from "lucide-react";
 
 import { motion } from "framer-motion";
@@ -130,38 +132,45 @@ export default function TrackLeads({ user, filter }) {
                         <motion.div key={item._id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
+                            transition={{ delay: index * 0.04 }}
                             whileHover={{ y: -4 }}
-                            className="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                            className="group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
                         >
-                            <div className="p-5 border-b border-b-gray-300 bg-linear-to-r from-gray-50 to-white">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center">
-                                            {getEventIcon(item.eventType)}
+                            <div className="px-4 py-3 border-b border-gray-200">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <div className="relative shrink-0">
+                                            <div className="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center shadow-sm">
+                                                {getEventIcon(item.eventType)}
+                                            </div>
+
+                                            {/* Active Dot */}
+                                            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
                                         </div>
 
-                                        <div>
-                                            <h3 className="font-semibold text-gray-800 capitalize">
+                                        <div className="min-w-0">
+                                            <h3 className="text-[16px] leading-none font-semibold text-gray-800 truncate">
                                                 {item?.buyerInfo?.name || "Unknown Buyer"}
                                             </h3>
 
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-sm text-gray-500 font-medium">
                                                 {getEventLabel(item.eventType)}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <span className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium">
-                                        {item.source || "dir"}
-                                    </span>
+                                    <div className="shrink-0">
+                                        <span className="px-4 py-2 rounded-full bg-linear-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold uppercase tracking-wide shadow-sm whitespace-nowrap">
+                                            {item.source || "Website"}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="p-5 space-y-4">
-                                <div className="bg-linear-to-r from-gray-50 to-gray-100 rounded-2xl p-4 border border-gray-100">
-                                    <p className="text-sm text-gray-700 leading-relaxed">
-                                        <span className="font-semibold text-gray-900">
+                            <div className="px-5 py-2.5 space-y-2.5">
+                                <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+                                    <p className="text-sm leading-6 text-gray-600">
+                                        <span className="font-semibold text-gray-800">
                                             {item?.buyerInfo?.name || "A Buyer"}
                                         </span>{" "}
                                         interacted with your listing by{" "}
@@ -175,44 +184,126 @@ export default function TrackLeads({ user, filter }) {
                                     </p>
                                 </div>
 
-                                <div className="space-y-3">
+                                <div className="space-y-2.5">
                                     {item?.buyerInfo?.email && (
-                                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                                            <Mail size={16} className="text-gray-400" />
-                                            {item.buyerInfo.email}
+                                        <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-blue-50 transition rounded-2xl px-4 py-2">
+                                            <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                <Mail
+                                                    size={18}
+                                                    className="text-blue-600"
+                                                />
+                                            </div>
+
+                                            <div className="min-w-0">
+                                                <p className="text-xs text-gray-800 mb-0.5">
+                                                    Email
+                                                </p>
+
+                                                <p className="text-[15px] font-medium text-gray-800 truncate">
+                                                    {item.buyerInfo.email}
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
 
                                     {item?.buyerInfo?.phone && (
-                                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                                            <Phone size={16} className="text-gray-400" />
-                                            {item.buyerInfo.phone}
+                                        <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-green-50 transition rounded-2xl px-4 py-2">
+                                            <div className="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                                                <Phone
+                                                    size={18}
+                                                    className="text-green-600"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <p className="text-xs text-gray-800 mb-0.5">
+                                                    Phone
+                                                </p>
+
+                                                <p className="text-[15px] font-medium text-gray-800">
+                                                    {item.buyerInfo.phone}
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
 
-                                    <div className="flex items-center gap-3 text-sm text-gray-600">
-                                        <Smartphone size={16} className="text-gray-400" />
-                                        {getDevice(item.userAgent)}
+                                    <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-purple-50 transition rounded-2xl px-4 py-2">
+                                        <div className="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                                            <Smartphone
+                                                size={18}
+                                                className="text-purple-600"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs text-gray-800 mb-0.5">
+                                                Device
+                                            </p>
+
+                                            <p className="text-[15px] font-medium text-gray-800">
+                                                {getDevice(item.userAgent)}
+                                            </p>
+                                        </div>
                                     </div>
 
                                     {item?.ipAddress && (
-                                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                                            <Globe size={16} className="text-gray-400" />
-                                            {item.ipAddress}
+                                        <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-orange-50 transition rounded-2xl px-4 py-2">
+                                            <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                                                <Globe
+                                                    size={18}
+                                                    className="text-orange-600"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <p className="text-xs text-gray-800 mb-0.5">
+                                                    IP Address
+                                                </p>
+
+                                                <p className="text-[15px] font-medium text-gray-800">
+                                                    {item.ipAddress}
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
+
+                                    <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-blue-50 transition rounded-2xl px-4 py-2">
+                                        <div className="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                            <Package
+                                                size={18}
+                                                className="text-blue-600"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs text-gray-800 mb-0.5">
+                                                Product
+                                            </p>
+
+                                            <p className="text-[15px] font-medium text-gray-800">
+                                                {item.productName || item.productId || "N/A"}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="px-5 py-4 border-t border-t-gray-300 bg-gray-50 flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <Clock size={15} />
-                                    {new Date(item.createdAt).toLocaleString()}
-                                </div>
+                            <div className="px-5 py-2 border-t border-gray-200 bg-gray-50 flex items-center justify-between gap-4">
+                                <div className="flex items-center w-full gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                        <Clock
+                                            size={14}
+                                            className="text-indigo-600"
+                                        />
+                                    </div>
 
-                                <span className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full">
-                                    {item.productId || "N/A"}
-                                </span>
+                                    <p className="text-sm flex justify-between text-gray-600 font-medium w-full">
+                                        {new Date(item.createdAt).toLocaleDateString()}
+                                        <span className="text-gray-600 text-sm">
+                                            {new Date(item.createdAt).toLocaleTimeString()}
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
                         </motion.div>
                     ))}
