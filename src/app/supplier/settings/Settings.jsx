@@ -86,8 +86,6 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col w-full lg:px-16 px-4 py-6 gap-6 bg-gray-100 min-h-screen">
-
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
         <p className="text-gray-500 mt-1">
@@ -96,24 +94,20 @@ export default function Settings() {
       </div>
 
       {/* Settings Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {settings.map((item, index) => (
-          <motion.div
-            key={index}
+          <motion.div key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.08 }}
+            transition={{ delay: index * 0.04 }}
             whileHover={{ scale: 1.02 }}
             className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between border border-gray-100"
           >
             <div className="flex items-start gap-4">
-
-              {/* Icon */}
               <div className="p-3 rounded-xl bg-gray-100 text-gray-700">
                 {item.icon}
               </div>
 
-              {/* Content */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">
                   {item.title}
@@ -124,9 +118,7 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Action Button */}
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all duration-200 ${buttonColors[item.color]}`}
+            <button className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all duration-200 ${buttonColors[item.color]}`}
             >
               {item.button}
               <LuChevronRight size={16} />
@@ -135,7 +127,6 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* Footer */}
       <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
         <h3 className="font-semibold text-gray-800 mb-2">
           Account Information

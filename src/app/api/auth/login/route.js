@@ -10,7 +10,7 @@ export async function POST(req) {
     const { email, password } = await req.json();
     console.log("email:", email)
     const user = await User.findOne({ email });
-    // console.log(user)
+
     if (!user) {
       return Response.json(
         { success: false, message: "User not found" },

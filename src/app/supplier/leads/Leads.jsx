@@ -1,12 +1,14 @@
 "use client"
 import LeadList from '@/components/Supplier/Leads/CardGrid';
 import FilterSidebar from '@/components/Supplier/Leads/FilterSidebar';
+import TrackLeads from '@/components/Supplier/Leads/TrackLeads';
 import { Filter, Search, X } from 'lucide-react'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 
 export default function Leads() {
     const [open, setOpen] = useState(false);
+    const [switchButton, setSwitchButton] = useState(false);
     const { user } = useSelector((state) => state.auth);
 
     return (
@@ -23,10 +25,34 @@ export default function Leads() {
                             <Filter size={18} />
                         </span>
                     </div>
+                    <div className="flex items-center bg-gray-100 p-1 rounded-xl w-fit shadow-sm">
+                        {/* Inquiry Leads */}
+                        <button
+                            onClick={() => setSwitchButton(false)}
+                            className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${!switchButton
+                                ? "bg-white shadow text-blue-600"
+                                : "text-gray-500 hover:text-black"
+                                }`}
+                        >
+                            Inquiry Leads
+                        </button>
+
+                        {/* Track Clicks */}
+                        <button
+                            onClick={() => setSwitchButton(true)}
+                            className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${switchButton
+                                ? "bg-white shadow text-green-600"
+                                : "text-gray-500 hover:text-black"
+                                }`}
+                        >
+                            Track Clicks
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-2 w-full md:w-auto">
                     <select name="" className='input py-2.5! text-gray-600'>
+                        <option value="">Today</option>
                         <option value="">All</option>
                         <option value="">Recent</option>
                         <option value="">Relevant</option>
@@ -46,7 +72,7 @@ export default function Leads() {
                 </div>
             </div>
 
-            <LeadList user={user} />
+            {switchButton ? <TrackLeads user={user} /> : <LeadList user={user} />}
 
             <FilterSidebar open={open} setOpen={setOpen} />
         </div>
