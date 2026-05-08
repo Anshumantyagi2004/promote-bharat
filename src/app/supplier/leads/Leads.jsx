@@ -10,6 +10,7 @@ export default function Leads() {
     const [open, setOpen] = useState(false);
     const [switchButton, setSwitchButton] = useState(false);
     const { user } = useSelector((state) => state.auth);
+    const [filter, setFilter] = useState("today");
 
     return (
         <div className='p-4 bg-gray-100 w-full'>
@@ -51,12 +52,16 @@ export default function Leads() {
                 </div>
 
                 <div className="flex items-center gap-2 w-full md:w-auto">
-                    <select name="" className='input py-2.5! text-gray-600'>
-                        <option value="">Today</option>
-                        <option value="">All</option>
-                        <option value="">Recent</option>
-                        <option value="">Relevant</option>
-                        <option value="">Newest</option>
+                    <select
+                        value={filter}
+                        onChange={(e) => setFilter(e.target.value)}
+                        className='input py-2.5! text-gray-600'
+                    >
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="7days">Last 7 Days</option>
+                        <option value="30days">Last 30 Days</option>
+                        <option value="all">All Time</option>
                     </select>
                     <div className="relative w-full">
                         <Search
@@ -72,7 +77,7 @@ export default function Leads() {
                 </div>
             </div>
 
-            {switchButton ? <TrackLeads user={user} /> : <LeadList user={user} />}
+            {switchButton ? <TrackLeads user={user} filter={filter} /> : <LeadList user={user} filter={filter} />}
 
             <FilterSidebar open={open} setOpen={setOpen} />
         </div>

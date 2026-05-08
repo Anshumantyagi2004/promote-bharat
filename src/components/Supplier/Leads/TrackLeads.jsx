@@ -17,7 +17,7 @@ import {
 import { motion } from "framer-motion";
 import axios from "axios";
 
-export default function TrackLeads({ user }) {
+export default function TrackLeads({ user, filter }) {
     const [trackingData, setTrackingData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -82,7 +82,7 @@ export default function TrackLeads({ user }) {
                 setLoading(true);
 
                 const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user?._id}`
+                    `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user?._id}?filter=${filter}`
                 );
 
                 if (response.data.success) {
@@ -98,25 +98,10 @@ export default function TrackLeads({ user }) {
         if (user?._id) {
             fetchLeads();
         }
-    }, [user]);
+    }, [user, filter]);
 
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold text-gray-800">
-                        Lead Tracking
-                    </h2>
-                </div>
-
-                <div className="bg-linear-to-r  from-blue-500 to-indigo-500 text-white px-5 py-3 rounded-2xl shadow-lg">
-                    <p className="text-sm opacity-90">Total Activities</p>
-
-                    <h3 className="text-2xl font-bold">
-                        {trackingData.length}
-                    </h3>
-                </div>
-            </div>
+        <div className="">
 
             {loading && (
                 <div className="flex items-center justify-center py-20">
@@ -141,7 +126,6 @@ export default function TrackLeads({ user }) {
             {/* Cards */}
             {!loading && trackingData.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-
                     {trackingData.map((item, index) => (
                         <motion.div key={item._id}
                             initial={{ opacity: 0, y: 20 }}

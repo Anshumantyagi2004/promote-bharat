@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function LeadList({ user }) {
+export default function LeadList({ user, filter }) {
   const [leadsData, setLeadsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export default function LeadList({ user }) {
         setLoading(true);
 
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}`
+          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=${filter}`
         );
 
         if (response.data.success) {
@@ -38,7 +38,7 @@ export default function LeadList({ user }) {
     if (user?._id) {
       fetchLeads();
     }
-  }, [user]);
+  }, [user, filter]);
 
   // Skeleton Loader Card
   const SkeletonCard = () => (
@@ -109,7 +109,7 @@ export default function LeadList({ user }) {
                   <Mail size={16} className="text-gray-400" />
                   {lead.platformEmail}
                 </p>
-                
+
                 <p className="flex items-center gap-2">
                   <Phone size={16} className="text-[#D01132]" />
                   {lead.phone}
