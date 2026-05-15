@@ -18,12 +18,20 @@ export async function middleware(req) {
 
   const token = req.cookies.get("promote_bharat_token")?.value;
 
-  // public routes
+  // 🟢 PUBLIC ROUTES
   if (PUBLIC_ROUTES.includes(pathname)) {
+    if (token) {
+      const user = await verifyToken(token);
+      if (user) {
+        return NextResponse.redirect(
+          new URL(`/${user.role}/dashboard`, req.url)
+        );
+      }
+    }
     return NextResponse.next();
   }
 
-  // no token
+  // 🔴 NO TOKEN → login
   if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
@@ -34,18 +42,28 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // only role check here (NO DB CALL)
+  // 🔐 ROLE BASED ACCESS (OLD FEATURE RESTORED)
   if (pathname.startsWith("/supplier") && user.role !== "supplier") {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(
+      new URL(`/${user.role}/dashboard`, req.url)
+    );
   }
 
   if (pathname.startsWith("/buyer") && user.role !== "buyer") {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(
+      new URL(`/${user.role}/dashboard`, req.url)
+    );
   }
 
   if (pathname.startsWith("/admin") && user.role !== "admin") {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(
+      new URL(`/${user.role}/dashboard`, req.url)
+    );
   }
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/", "/login", "/buyer/:path*", "/supplier/:path*", "/admin/:path*"],
+};
