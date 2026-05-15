@@ -85,13 +85,14 @@ export default function Settings() {
 
   return (
     <div className="flex flex-col w-full lg:px-16 px-4 py-6 gap-6 bg-gray-100 min-h-screen">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
-        <p className="text-gray-500 mt-1">
-          Manage your account preferences and security settings.
-        </p>
-      </div>
       {layout == null ? <>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
+          <p className="text-gray-500 mt-1">
+            Manage your account preferences and security settings.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {settings.map((item, index) => (
             <motion.div key={index} initial={{ opacity: 0, y: 20 }}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     ArrowLeft,
     LogOut,
@@ -8,115 +8,111 @@ import {
     Monitor,
     Laptop,
     SmartphoneIcon,
+    Trash2,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import {
-    RecaptchaVerifier,
-    signInWithPhoneNumber,
-} from "firebase/auth";
-import { auth } from "@/firebase/config";
+import axios from "axios";
 import Input from "@/components/Inputs/FormInput";
+import { sendFirebaseOtp, verifyFirebaseOtp } from "@/utils/firebaseOtp";
 
 export default function SignOut({ setLayout, user }) {
     const [step, setStep] = useState(1);
     const [otp, setOtp] = useState("");
+    const [devices, setDevices] = useState([]);
 
-    // DUMMY DEVICES
-    const devices = [
-        {
-            id: 1,
-            name: "Chrome on Windows",
-            location: "Ahmedabad, India",
-            current: true,
-            icon: Laptop,
-        },
-        {
-            id: 2,
-            name: "iPhone 15 Pro",
-            location: "Surat, India",
-            current: false,
-            icon: SmartphoneIcon,
-        },
-        {
-            id: 3,
-            name: "Edge Browser",
-            location: "Mumbai, India",
-            current: false,
-            icon: Monitor,
-        },
-    ];
-
-    // SEND OTP
     const sendOtp = async () => {
-        try {
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new RecaptchaVerifier(
-                    auth,
-                    "logout-recaptcha",
-                    {
-                        size: "invisible",
-                        callback: () => {
-                            console.log("Recaptcha Verified");
-                        },
-                    }
-                );
-            }
+        const response = await sendFirebaseOtp(`+91${user?.phone}`, "logout-recaptcha");
 
-            const appVerifier = window.recaptchaVerifier;
-            const phoneNumber = `+91${user?.phone}`;
-            const confirmationResult = await signInWithPhoneNumber(
-                auth,
-                phoneNumber,
-                appVerifier
-            );
-
-            window.confirmationResult = confirmationResult;
+        if (response.success) {
             toast.success("OTP Sent Successfully");
             setStep(2);
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message);
+        } else {
+            toast.error(response.error.message);
         }
     };
 
-    // VERIFY OTP
     const verifyOtp = async () => {
-        try {
-            if (!otp) {
-                toast.error("Enter OTP");
-                return;
-            }
+        if (!otp) return toast.error("Enter OTP First");
 
-            const result = await window.confirmationResult.confirm(otp);
-            console.log(result.user);
-            toast.success("OTP Verified");
+        const response = await verifyFirebaseOtp(otp);
+
+        if (response.success) {
+            toast.success("OTP Verified Successfully");
             setStep(3);
-        } catch (error) {
-            console.log(error);
+        } else {
             toast.error("Invalid OTP");
         }
     };
 
-    // SIGNOUT
+    const removeDevice = async (id) => {
+        try {
+            console.log(id)
+            const res = await axios.delete(`/api/auth/sessions/${id}`);
+
+            if (res.data.success) {
+                toast.success(res.data.message);
+                // update UI instantly
+                fetchDevices()
+            } else {
+                toast.error(res.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Error removing device");
+        }
+    };
+
     const logoutAllDevices = async () => {
         try {
+            const res = await axios.post("/api/auth/sessions");
 
-            // API CALL HERE
+            if (res.data.success) {
+                toast.success("Other devices logged out");
 
-            toast.success("Logged out from all devices");
-
+                fetchDevices(); // refresh list
+            } else {
+                toast.error("Failed to logout devices");
+            }
         } catch (error) {
-
             console.log(error);
+            toast.error("Error logging out");
+        }
+    };
 
-            toast.error("Something went wrong");
+    const fetchDevices = async () => {
+        try {
+            const res = await axios.get("/api/auth/sessions");
+
+            if (res.data.success) {
+                setDevices(res.data.sessions);
+            } else {
+                toast.error("Failed to load devices");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Error fetching devices");
+        }
+    };
+
+    useEffect(() => {
+        if (step === 3) {
+            fetchDevices();
+        }
+    }, [step]);
+
+    const getIcon = (type) => {
+        switch (type) {
+            case "mobile":
+                return Smartphone;
+            case "desktop":
+                return Laptop;
+            default:
+                return Monitor;
         }
     };
 
     return (
         <div className="bg-white rounded-3xl shadow-md p-6 border border-gray-100 max-w-2xl mx-auto">
-
-            {/* HEADER */}
             <div className="flex flex-col items-center justify-center text-center mb-6 relative">
                 <button
                     onClick={() => setLayout(null)}
@@ -143,14 +139,11 @@ export default function SignOut({ setLayout, user }) {
                 </p>
             </div>
 
-            {/* STEPPER */}
             <div className="flex justify-center w-full mb-6">
                 <div className="flex items-center justify-center max-w-2xl w-full">
                     {["Phone", "Verify OTP", "Devices"].map((item, index) => (
                         <React.Fragment key={index}>
-
                             <div className="flex flex-col items-center min-w-25">
-
                                 <div
                                     className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
                                     ${step >= index + 1
@@ -203,7 +196,7 @@ export default function SignOut({ setLayout, user }) {
                     </div>
 
                     <button onClick={sendOtp}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-medium transition"
+                        className="cursor-pointer w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-medium transition"
                     >
                         Send OTP
                     </button>
@@ -222,8 +215,7 @@ export default function SignOut({ setLayout, user }) {
                         onChange={(e) => setOtp(e.target.value)}
                     />
 
-                    <button onClick={verifyOtp}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition"
+                    <button onClick={verifyOtp} className="cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition"
                     >
                         Verify OTP
                     </button>
@@ -235,38 +227,39 @@ export default function SignOut({ setLayout, user }) {
                 <div className="space-y-5">
                     <div className="space-y-4">
                         {devices.map((device) => {
-                            const Icon = device.icon;
+                            const Icon = getIcon(device.deviceType);
                             return (
-                                <div key={device.id}
-                                    className="border border-gray-200 rounded-2xl p-4 flex items-center justify-between"
-                                >
+                                <div key={device._id} className="border border-gray-200 rounded-2xl p-4 flex items-center justify-between"                                >
                                     <div className="flex items-center gap-4">
                                         <div className="bg-gray-100 p-3 rounded-xl">
                                             <Icon size={22} className="text-gray-700" />
                                         </div>
                                         <div>
                                             <h3 className="font-semibold text-gray-800">
-                                                {device.name}
+                                                {device?.deviceName || "Unknown Device"}
                                             </h3>
 
                                             <p className="text-sm text-gray-500">
-                                                {device.location}
+                                                {device?.ip || "Unknown Location"}
                                             </p>
                                         </div>
                                     </div>
 
-                                    {device.current && (
-                                        <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
+                                    {device.current ? (
+                                        <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
                                             Current
                                         </span>
+                                    ) : (
+                                        <button onClick={() => removeDevice(device?._id)} className="bg-red-100 text-red-500 text-xs font-medium px-2 py-2 hover:bg-red-200 rounded-md">
+                                            <Trash2 size={18} />
+                                        </button>
                                     )}
                                 </div>
                             );
                         })}
                     </div>
 
-                    <button onClick={logoutAllDevices}
-                        className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition"
+                    <button onClick={logoutAllDevices} className="cursor-pointer w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-medium transition"
                     >
                         Logout All Devices
                     </button>

@@ -10,10 +10,17 @@ function InitAuth({ children }) {
 
   useEffect(() => {
     const loadUser = async () => {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      if (data.user) {
-        dispatch(setUser(data.user));
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+
+        if (data.user) {
+          dispatch(setUser(data.user));
+        } else {
+          dispatch(setUser(null)); // IMPORTANT FIX
+        }
+      } catch (err) {
+        dispatch(setUser(null));
       }
     };
 
@@ -24,7 +31,6 @@ function InitAuth({ children }) {
 }
 
 export default function ReduxProvider({ children }) {
-
   return (
     <Provider store={store}>
       <InitAuth>{children}</InitAuth>

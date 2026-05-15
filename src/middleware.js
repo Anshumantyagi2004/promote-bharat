@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const PUBLIC_ROUTES = ["/", "/login"];
-const BUYER_ROUTES = ["/buyer"];
-const SUPPLIER_ROUTES = ["/supplier"];
 
 async function verifyToken(token) {
   try {
@@ -16,56 +14,38 @@ async function verifyToken(token) {
 }
 
 export async function middleware(req) {
-  const token = req.cookies.get("promote_bharat_token")?.value;
   const { pathname } = req.nextUrl;
-  const user = token ? await verifyToken(token) : null;
 
-  // 🟢 PUBLIC ROUTES
+  const token = req.cookies.get("promote_bharat_token")?.value;
+
+  // public routes
   if (PUBLIC_ROUTES.includes(pathname)) {
-    if (user && pathname === "/login") {
-      return NextResponse.redirect(
-        new URL(`/${user.role}/dashboard`, req.url)
-      );
-    }
     return NextResponse.next();
   }
 
-  // 🔴 NOT LOGGED IN → protect dashboard routes
+  // no token
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  const user = await verifyToken(token);
+
   if (!user) {
-    if (pathname.startsWith("/buyer") || pathname.startsWith("/supplier") || pathname.startsWith("/admin")) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-    return NextResponse.next();
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // 🔐 ROLE BASED ACCESS
+  // only role check here (NO DB CALL)
   if (pathname.startsWith("/supplier") && user.role !== "supplier") {
-    return NextResponse.redirect(
-      new URL(`/${user.role}/dashboard`, req.url)
-    );
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   if (pathname.startsWith("/buyer") && user.role !== "buyer") {
-    return NextResponse.redirect(
-      new URL(`/${user.role}/dashboard`, req.url)
-    );
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   if (pathname.startsWith("/admin") && user.role !== "admin") {
-    return NextResponse.redirect(
-      new URL(`/${user.role}/dashboard`, req.url)
-    );
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: [
-    "/",
-    "/login",
-    "/buyer/:path*",
-    "/supplier/:path*",
-    "/admin/:path*",
-  ],
-};
