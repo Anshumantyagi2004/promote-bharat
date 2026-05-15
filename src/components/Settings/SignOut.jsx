@@ -149,7 +149,7 @@ export default function SignOut({ setLayout, user }) {
                     {["Phone", "Verify OTP", "Devices"].map((item, index) => (
                         <React.Fragment key={index}>
 
-                            <div className="flex flex-col items-center min-w-[100px]">
+                            <div className="flex flex-col items-center min-w-25">
 
                                 <div
                                     className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
