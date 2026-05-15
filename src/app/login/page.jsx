@@ -26,23 +26,28 @@ export default function LoginPage() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        if (otpMode) return toast.success("Only Login with Password Working");
+        if (otpMode) {
+            return toast.success("Only Login with Password Working");
+        }
         try {
             const res = await axios.post("/api/auth/login", form);
             const data = res.data;
-            if (!data.success) {
-                toast.error(data.message);
-                return;
-            }
-            const res1 = await fetch("/api/auth/me");
-            const data1 = await res1.json();
-            if (data1.user) {
-                dispatch(setUser(data1.user));
+
+            if (data.success) {
                 toast.success("Login Successful");
-                router.push(`/${data1.user.role}/dashboard`);
+                const res1 = await fetch("/api/auth/me");
+                const data1 = await res1.json();
+
+                if (data1.user) {
+                    dispatch(setUser(data1.user));
+                    router.push(`/${data1.user.role}/dashboard`);
+                }
             }
         } catch (error) {
-            toast.error("Something went wrong");
+            // console.log(error);
+            toast.error(
+                error?.response?.data?.message || "Something went wrong"
+            );
         }
     };
 

@@ -1,5 +1,5 @@
 "use client"
-import React from "react";
+import React, { useState } from "react";
 import {
   LuLock,
   LuLogOut,
@@ -12,10 +12,18 @@ import {
   LuChevronRight,
 } from "react-icons/lu";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import Layout from "@/components/Settings/Layout";
+import { useRouter } from "next/navigation";
 
 export default function Settings() {
+  const router = useRouter();
+  const { user } = useSelector((state) => state.auth);
+  const [layout, setLayout] = useState(null)
+
   const settings = [
     {
+      id: "change-password",
       title: "Change Password",
       description: "Update your password to keep your account secure.",
       icon: <LuLock size={22} />,
@@ -23,6 +31,7 @@ export default function Settings() {
       color: "blue",
     },
     {
+      id: "signout",
       title: "Signout from all devices",
       description: "This will logout you from all devices.",
       icon: <LuLogOut size={22} />,
@@ -30,6 +39,7 @@ export default function Settings() {
       color: "orange",
     },
     {
+      id: "disable-account",
       title: "Disable Account",
       description: "This will remove your account from Promote Bharat.",
       icon: <LuTrash2 size={22} />,
@@ -37,6 +47,7 @@ export default function Settings() {
       color: "red",
     },
     {
+      id: "notifications",
       title: "Notifications",
       description: "Manage push notifications and email alerts.",
       icon: <LuBell size={22} />,
@@ -44,20 +55,7 @@ export default function Settings() {
       color: "purple",
     },
     {
-      title: "Privacy & Security",
-      description: "Control your account privacy settings.",
-      icon: <LuShieldCheck size={22} />,
-      button: "Open",
-      color: "green",
-    },
-    {
-      title: "Dark Mode",
-      description: "Switch between dark and light themes.",
-      icon: <LuMoon size={22} />,
-      button: "Enable",
-      color: "gray",
-    },
-    {
+      id: "language",
       title: "Language",
       description: "Choose your preferred application language.",
       icon: <LuGlobe size={22} />,
@@ -65,6 +63,7 @@ export default function Settings() {
       color: "cyan",
     },
     {
+      id: "profile-settings",
       title: "Profile Settings",
       description: "Edit your personal information and profile.",
       icon: <LuUser size={22} />,
@@ -92,49 +91,47 @@ export default function Settings() {
           Manage your account preferences and security settings.
         </p>
       </div>
-
-      {/* Settings Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {settings.map((item, index) => (
-          <motion.div key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.04 }}
-            whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between border border-gray-100"
-          >
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-gray-100 text-gray-700">
-                {item.icon}
-              </div>
-
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {item.title}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1 max-w-sm">
-                  {item.description}
-                </p>
-              </div>
-            </div>
-
-            <button className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all duration-200 ${buttonColors[item.color]}`}
+      {layout == null ? <>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {settings.map((item, index) => (
+            <motion.div key={index} initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} whileHover={{ scale: 1.02 }}
+              className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between border border-gray-100"
             >
-              {item.button}
-              <LuChevronRight size={16} />
-            </button>
-          </motion.div>
-        ))}
-      </div>
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-xl bg-gray-100 text-gray-700">
+                  {item.icon}
+                </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
-        <h3 className="font-semibold text-gray-800 mb-2">
-          Account Information
-        </h3>
-        <p className="text-sm text-gray-500">
-          Your account is currently active and protected with security features.
-        </p>
-      </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {item.title}
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1 max-w-sm">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+
+              <button onClick={() => { item.id === "profile-settings" ? router.push("/supplier/profile") : setLayout(item.id) }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all duration-200 ${buttonColors[item.color]}`} >
+                {item.button}
+                <LuChevronRight size={16} />
+              </button>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+          <h3 className="font-semibold text-gray-800 mb-2">
+            Account Information
+          </h3>
+          <p className="text-sm text-gray-500">
+            Your account is currently active and protected with security features.
+          </p>
+        </div>
+      </>
+        : <Layout layout={layout} setLayout={setLayout} user={user} />}
     </div>
   );
 }
