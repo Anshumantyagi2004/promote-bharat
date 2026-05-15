@@ -2,12 +2,10 @@
 import React, { useState } from "react";
 import {
     ArrowLeft,
-    LogOut,
+    Trash2,
     Smartphone,
     ShieldCheck,
-    Monitor,
-    Laptop,
-    SmartphoneIcon,
+    AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -17,34 +15,9 @@ import {
 import { auth } from "@/firebase/config";
 import Input from "@/components/Inputs/FormInput";
 
-export default function SignOut({ setLayout, user }) {
+export default function DisableAccount({ setLayout, user }) {
     const [step, setStep] = useState(1);
     const [otp, setOtp] = useState("");
-
-    // DUMMY DEVICES
-    const devices = [
-        {
-            id: 1,
-            name: "Chrome on Windows",
-            location: "Ahmedabad, India",
-            current: true,
-            icon: Laptop,
-        },
-        {
-            id: 2,
-            name: "iPhone 15 Pro",
-            location: "Surat, India",
-            current: false,
-            icon: SmartphoneIcon,
-        },
-        {
-            id: 3,
-            name: "Edge Browser",
-            location: "Mumbai, India",
-            current: false,
-            icon: Monitor,
-        },
-    ];
 
     // SEND OTP
     const sendOtp = async () => {
@@ -52,7 +25,7 @@ export default function SignOut({ setLayout, user }) {
             if (!window.recaptchaVerifier) {
                 window.recaptchaVerifier = new RecaptchaVerifier(
                     auth,
-                    "logout-recaptcha",
+                    "disable-account-recaptcha",
                     {
                         size: "invisible",
                         callback: () => {
@@ -89,7 +62,7 @@ export default function SignOut({ setLayout, user }) {
 
             const result = await window.confirmationResult.confirm(otp);
             console.log(result.user);
-            toast.success("OTP Verified");
+            toast.success("OTP Verified Successfully");
             setStep(3);
         } catch (error) {
             console.log(error);
@@ -97,13 +70,13 @@ export default function SignOut({ setLayout, user }) {
         }
     };
 
-    // SIGNOUT
-    const logoutAllDevices = async () => {
+    // DISABLE ACCOUNT
+    const disableAccount = async () => {
         try {
 
             // API CALL HERE
 
-            toast.success("Logged out from all devices");
+            toast.success("Account Disabled Successfully");
 
         } catch (error) {
 
@@ -115,46 +88,44 @@ export default function SignOut({ setLayout, user }) {
 
     return (
         <div className="bg-white rounded-3xl shadow-md p-6 border border-gray-100 max-w-2xl mx-auto">
-
-            {/* HEADER */}
             <div className="flex flex-col items-center justify-center text-center mb-6 relative">
                 <button
                     onClick={() => setLayout(null)}
                     className="absolute left-0 top-0 flex items-center gap-2 
-    bg-white/80 backdrop-blur-md border border-gray-200 
-    text-gray-700 px-4 py-2 rounded-md shadow-sm 
-    hover:bg-white hover:shadow-md hover:-translate-y-0.5
-    transition-all duration-200"
+                    bg-white/80 backdrop-blur-md border border-gray-200 
+                    text-gray-700 px-4 py-2 rounded-md shadow-sm 
+                    hover:bg-white hover:shadow-md hover:-translate-y-0.5
+                    transition-all duration-200"
                 >
                     <ArrowLeft size={18} />
                     <span className="font-medium">Back</span>
                 </button>
 
-                <div className="bg-orange-100 p-4 rounded-2xl mb-2">
-                    <LogOut size={28} className="text-orange-600" />
+                <div className="flex flex-col items-center">
+
+                    <div className="bg-red-100 p-4 rounded-2xl mb-2">
+                        <Trash2 size={28} className="text-red-600" />
+                    </div>
+
+                    <h2 className="text-3xl font-bold text-gray-800">
+                        Disable Account
+                    </h2>
+
+                    <p className="text-sm text-gray-500 mt-1 max-w-md">
+                        Verify your mobile number before disabling your account.
+                    </p>
                 </div>
-
-                <h2 className="text-3xl font-bold text-gray-800">
-                    Signout All Devices
-                </h2>
-
-                <p className="text-sm text-gray-500 mt-1 max-w-md">
-                    Verify your mobile number before signing out from all devices.
-                </p>
             </div>
 
-            {/* STEPPER */}
             <div className="flex justify-center w-full mb-6">
                 <div className="flex items-center justify-center max-w-2xl w-full">
-                    {["Phone", "Verify OTP", "Devices"].map((item, index) => (
+                    {["Phone", "Verify OTP", "Disable"].map((item, index) => (
                         <React.Fragment key={index}>
-
                             <div className="flex flex-col items-center min-w-[100px]">
-
                                 <div
                                     className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
                                     ${step >= index + 1
-                                            ? "bg-orange-500 text-white"
+                                            ? "bg-red-500 text-white"
                                             : "bg-gray-200 text-gray-600"
                                         }`}
                                 >
@@ -170,12 +141,11 @@ export default function SignOut({ setLayout, user }) {
                                 <div
                                     className={`w-32 h-1 rounded-full mx-2 mb-6 transition-all duration-300
                                     ${step > index + 1
-                                            ? "bg-orange-500"
+                                            ? "bg-red-500"
                                             : "bg-gray-200"
                                         }`}
                                 />
                             )}
-
                         </React.Fragment>
                     ))}
                 </div>
@@ -184,9 +154,9 @@ export default function SignOut({ setLayout, user }) {
             {/* STEP 1 */}
             {step === 1 && (
                 <div className="space-y-6">
-                    <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5">
+                    <div className="bg-red-50 border border-red-100 rounded-2xl p-5">
                         <div className="flex items-center gap-3">
-                            <div className="bg-orange-500 text-white p-3 rounded-xl">
+                            <div className="bg-red-500 text-white p-3 rounded-xl">
                                 <Smartphone size={22} />
                             </div>
 
@@ -202,8 +172,9 @@ export default function SignOut({ setLayout, user }) {
                         </div>
                     </div>
 
-                    <button onClick={sendOtp}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-medium transition"
+                    <button
+                        onClick={sendOtp}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition"
                     >
                         Send OTP
                     </button>
@@ -222,7 +193,8 @@ export default function SignOut({ setLayout, user }) {
                         onChange={(e) => setOtp(e.target.value)}
                     />
 
-                    <button onClick={verifyOtp}
+                    <button
+                        onClick={verifyOtp}
                         className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-medium transition"
                     >
                         Verify OTP
@@ -232,48 +204,41 @@ export default function SignOut({ setLayout, user }) {
 
             {/* STEP 3 */}
             {step === 3 && (
-                <div className="space-y-5">
-                    <div className="space-y-4">
-                        {devices.map((device) => {
-                            const Icon = device.icon;
-                            return (
-                                <div key={device.id}
-                                    className="border border-gray-200 rounded-2xl p-4 flex items-center justify-between"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-gray-100 p-3 rounded-xl">
-                                            <Icon size={22} className="text-gray-700" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold text-gray-800">
-                                                {device.name}
-                                            </h3>
+                <div className="space-y-6">
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
+                        <div className="flex items-start gap-3">
+                            <div className="bg-red-500 text-white p-3 rounded-xl">
+                                <AlertTriangle size={22} />
+                            </div>
 
-                                            <p className="text-sm text-gray-500">
-                                                {device.location}
-                                            </p>
-                                        </div>
-                                    </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-red-600">
+                                    Warning
+                                </h3>
 
-                                    {device.current && (
-                                        <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
-                                            Current
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Disabling your account will:
+                                </p>
+
+                                <ul className="mt-3 space-y-2 text-sm text-gray-700 list-disc pl-5">
+                                    <li>Logout you from all devices</li>
+                                    <li>Hide your profile and services</li>
+                                    <li>Disable account access temporarily</li>
+                                    <li>You can contact support to reactivate</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
-                    <button onClick={logoutAllDevices}
+                    <button onClick={disableAccount}
                         className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition"
                     >
-                        Logout All Devices
+                        Disable My Account
                     </button>
                 </div>
             )}
 
-            <div id="logout-recaptcha"></div>
+            <div id="disable-account-recaptcha"></div>
         </div>
     );
 }

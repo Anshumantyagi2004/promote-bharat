@@ -13,6 +13,9 @@ import {
 import { useRouter } from "next/navigation";
 import ChangePassword from "./ChangePassword";
 import SignOut from "./SignOut";
+import DisableAccount from "./DisableAccount";
+import Notification from "./Notification";
+import Language from "./Language";
 
 export default function Layout({ layout, setLayout, user }) {
     const router = useRouter();
@@ -34,74 +37,19 @@ export default function Layout({ layout, setLayout, user }) {
             // DISABLE ACCOUNT
             case "disable-account":
                 return (
-                    <div className="space-y-5">
-                        <h2 className="text-2xl font-bold text-red-600 flex items-center gap-2">
-                            <Trash2 size={22} />
-                            Disable Account
-                        </h2>
-
-                        <p className="text-gray-500">
-                            Once disabled, your account will no longer be accessible.
-                        </p>
-
-                        <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl">
-                            Disable Account
-                        </button>
-                    </div>
+                    <DisableAccount setLayout={setLayout} user={user} />
                 );
 
             // NOTIFICATIONS
             case "notifications":
                 return (
-                    <div className="space-y-5">
-                        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                            <Bell size={22} />
-                            Notifications
-                        </h2>
-
-                        <div className="flex items-center justify-between border p-4 rounded-xl">
-                            <div>
-                                <h3 className="font-semibold">Email Notifications</h3>
-                                <p className="text-sm text-gray-500">
-                                    Receive updates through email
-                                </p>
-                            </div>
-
-                            <input type="checkbox" className="w-5 h-5" />
-                        </div>
-
-                        <div className="flex items-center justify-between border p-4 rounded-xl">
-                            <div>
-                                <h3 className="font-semibold">Push Notifications</h3>
-                                <p className="text-sm text-gray-500">
-                                    Receive push notifications
-                                </p>
-                            </div>
-
-                            <input type="checkbox" className="w-5 h-5" />
-                        </div>
-                    </div>
+                    <Notification setLayout={setLayout} user={user} />
                 );
 
             // LANGUAGE
             case "language":
                 return (
-                    <div className="space-y-5">
-                        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                            <Globe size={22} />
-                            Language Settings
-                        </h2>
-
-                        <select className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyan-500">
-                            <option>English</option>
-                            <option>Hindi</option>
-                            <option>Gujarati</option>
-                        </select>
-
-                        <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-3 rounded-xl">
-                            Save Language
-                        </button>
-                    </div>
+                    <Language setLayout={setLayout} user={user} />
                 );
 
             // PROFILE SETTINGS

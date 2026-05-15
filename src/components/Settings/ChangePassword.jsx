@@ -120,11 +120,16 @@ export default function ChangePassword({ setLayout, user }) {
     return (
         <div className="bg-white rounded-3xl shadow-md p-6 border border-gray-100 max-w-2xl mx-auto">
             <div className="flex flex-col items-center justify-center text-center mb-6 relative">
-                <button onClick={() => setLayout(null)}
-                    className="absolute left-0 top-0 flex items-center gap-2 bg-[#0a5183] text-white px-4 py-2 rounded-xl hover:bg-[#074977] transition"
+                <button
+                    onClick={() => setLayout(null)}
+                    className="absolute left-0 top-0 flex items-center gap-2 
+                    bg-white/80 backdrop-blur-md border border-gray-200 
+                    text-gray-700 px-4 py-2 rounded-md shadow-sm 
+                    hover:bg-white hover:shadow-md hover:-translate-y-0.5
+                    transition-all duration-200"
                 >
                     <ArrowLeft size={18} />
-                    Back
+                    <span className="font-medium">Back</span>
                 </button>
 
                 <div className="flex flex-col items-center">
