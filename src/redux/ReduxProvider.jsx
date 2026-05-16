@@ -27,7 +27,7 @@ function InitAuth({ children }) {
     loadUser();
     const interval = setInterval(() => {
       loadUser();
-    }, 60000); // 60 sec
+    }, 6000); // 60 sec
 
     return () => clearInterval(interval);
   }, []);
