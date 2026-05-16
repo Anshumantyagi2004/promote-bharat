@@ -28,11 +28,6 @@ const userSchema = new mongoose.Schema(
       enum: ["buyer", "supplier", "admin"],
       default: "buyer",
     },
-
-    tokenVersion: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true }
 );

@@ -1,41 +1,63 @@
-// import { connectDB } from "@/config/db";
-// import User from "@/models/User";
-// import jwt from "jsonwebtoken";
-// import { cookies } from "next/headers";
+import { connectDB } from "@/config/db";
+import Session from "@/models/Session";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-// export async function POST(req) {
-//   try {
-//     await connectDB();
+export async function POST() {
+    try {
+        await connectDB();
 
-//     const cookieStore = await cookies();
+        const cookieStore = await cookies();
 
-//     const token = cookieStore.get("promote_bharat_token")?.value;
+        const token = cookieStore.get("promote_bharat_token")?.value;
 
-//     if (!token) {
-//       return Response.json({
-//         success: false,
-//         message: "Unauthorized",
-//       });
-//     }
+        if (!token) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Unauthorized",
+                },
+                { status: 401 }
+            );
+        }
 
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
 
-//     await User.findByIdAndUpdate(decoded.id, {
-//       $inc: { tokenVersion: 1 },
-//     });
+        // 🔥 DELETE ALL USER SESSIONS
+        await Session.deleteMany({
+            userId: decoded.id,
+        });
 
-//     cookieStore.delete("promote_bharat_token");
+        // 🍪 CLEAR COOKIE
+        const response = NextResponse.json({
+            success: true,
+            message: "Logged out from all devices",
+        });
 
-//     return Response.json({
-//       success: true,
-//       message: "Logged out from all devices",
-//     });
-//   } catch (error) {
-//     console.log(error);
+        response.cookies.set(
+            "promote_bharat_token",
+            "",
+            {
+                path: "/",
+                maxAge: 0,
+            }
+        );
 
-//     return Response.json({
-//       success: false,
-//       message: "Server Error",
-//     });
-//   }
-// }
+        return response;
+
+    } catch (error) {
+        console.log(error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Server Error",
+            },
+            { status: 500 }
+        );
+    }
+}

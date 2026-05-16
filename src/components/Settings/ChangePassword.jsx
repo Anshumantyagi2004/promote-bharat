@@ -102,6 +102,7 @@ export default function ChangePassword({ setLayout, user }) {
 
             console.log(response.data);
             toast.success("Password Updated Successfully");
+            setLayout(null)
             setForm({
                 ...form,
                 newPassword: "",
